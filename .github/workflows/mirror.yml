@@ -10,5 +10,5 @@ jobs:
           fetch-depth: 0
       - uses: pixta-dev/repository-mirroring-action@v1
         with:
-          target_repo_url: git@gitlab.com:SupraSense/SoftwareArceo-Backup.git
+          target_repo_url: git@gitlab.com:ignasamo2/softwarearceo-backup.git
           ssh_private_key: ${{ secrets.GITLAB_SSH_PRIVATE_KEY }}
