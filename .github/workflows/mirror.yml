@@ -12,3 +12,4 @@ jobs:
         with:
           target_repo_url: git@gitlab.com:ignasamo2/softwarearceo-backup.git
           ssh_private_key: ${{ secrets.GITLAB_SSH_PRIVATE_KEY }}
+          ssh_username: git
