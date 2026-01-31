@@ -6,3 +6,8 @@ datasource db {
 generator client {
   provider = "prisma-client-js"
 }
+
+model TipoTarea {
+  id     Int    @id @default(autoincrement())
+  nombre String @unique
+}

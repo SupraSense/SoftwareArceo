@@ -10,6 +10,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
+import tipoTareaRoutes from './routes/tipoTareaRoutes';
+
+app.use('/api/tipo-tarea', tipoTareaRoutes);
+
 app.get('/', (_req: Request, res: Response) => {
     res.send('Hello world');
 });

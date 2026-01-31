@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Landing } from './pages/public/Landing';
 import { Login } from './pages/auth/Login';
 import { Home } from './pages/dashboard/Home';
+import { TipoTareaPage } from './pages/configuration/TipoTareaPage';
 import { DashboardLayout } from './components/layout/DashboardLayout';
 
 // Layout para rutas protegidas (Placeholder para Auth Check real)
@@ -32,6 +33,7 @@ function App() {
         {/* Rutas Protegidas */}
         <Route element={<AuthLayout />}>
           <Route path="/app" element={<Home />} />
+          <Route path="/app/configuration/task-types" element={<TipoTareaPage />} />
         </Route>
 
         {/* Fallback */}

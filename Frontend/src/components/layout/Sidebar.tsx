@@ -25,23 +25,23 @@ interface SidebarProps {
 
 export const Sidebar: React.FC<SidebarProps> = ({ className = '', onClose }) => {
     const navItems = [
-        { name: 'Inicio', icon: LayoutDashboard, path: '/dashboard', active: true },
-        { name: 'Órdenes de Trabajo', icon: ClipboardList, path: '/dashboard/orders' },
-        { name: 'Tareas Kanban', icon: Trello, path: '/dashboard/kanban' },
-        { name: 'Bandeja Remitos', icon: Inbox, path: '/dashboard/remitos' },
-        { name: 'Agenda', icon: Calendar, path: '/dashboard/agenda' },
-        { name: 'Mensajes Programados', icon: MessageSquare, path: '/dashboard/messages' },
-        { name: 'KPIs y Reportes', icon: BarChart2, path: '/dashboard/reports' },
-        { name: 'Clientes', icon: Building2, path: '/dashboard/clients' },
-        { name: 'Recursos', icon: Truck, path: '/dashboard/resources' },
-        { name: 'Personal', icon: Users, path: '/dashboard/staff' },
-        { name: 'Planilla Choferes', icon: UserCircle, path: '/dashboard/drivers' },
-        { name: 'Planilla Talleres', icon: FileSpreadsheet, path: '/dashboard/workshops' },
-        { name: 'Facturación', icon: DollarSign, path: '/dashboard/billing' },
+        { name: 'Inicio', icon: LayoutDashboard, path: '/app', active: true },
+        { name: 'Órdenes de Trabajo', icon: ClipboardList, path: '/app/orders' },
+        { name: 'Tareas Kanban', icon: Trello, path: '/app/kanban' },
+        { name: 'Bandeja Remitos', icon: Inbox, path: '/app/remitos' },
+        { name: 'Agenda', icon: Calendar, path: '/app/agenda' },
+        { name: 'Mensajes Programados', icon: MessageSquare, path: '/app/messages' },
+        { name: 'KPIs y Reportes', icon: BarChart2, path: '/app/reports' },
+        { name: 'Clientes', icon: Building2, path: '/app/clients' },
+        { name: 'Recursos', icon: Truck, path: '/app/resources' },
+        { name: 'Personal', icon: Users, path: '/app/staff' },
+        { name: 'Planilla Choferes', icon: UserCircle, path: '/app/drivers' },
+        { name: 'Planilla Talleres', icon: FileSpreadsheet, path: '/app/workshops' },
+        { name: 'Facturación', icon: DollarSign, path: '/app/billing' },
     ];
 
     const configItems = [
-        { name: 'Tipos de Tareas', icon: Settings, path: '/dashboard/settings/tasks' },
+        { name: 'Tipos de Tareas', icon: Settings, path: '/app/configuration/task-types' },
     ];
 
     return (
