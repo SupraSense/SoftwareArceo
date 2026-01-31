@@ -1,0 +1,37 @@
+{
+    "realm": "SoftwareArceo",
+    "enabled": true,
+    "roles": {
+        "realm": [
+            {
+                "name": "admin",
+                "description": "Administrador del SGO"
+            },
+            {
+                "name": "coordinador",
+                "description": "Gestión de OTs y Recursos"
+            },
+            {
+                "name": "chofer",
+                "description": "Personal operativo de campo"
+            },
+            {
+                "name": "taller_movil",
+                "description": "Mantenimiento de recursos"
+            }
+        ]
+    },
+    "clients": [
+        {
+            "clientId": "sgo-frontend",
+            "enabled": true,
+            "publicClient": true,
+            "redirectUris": [
+                "http://localhost:5173/*"
+            ],
+            "webOrigins": [
+                "http://localhost:5173"
+            ]
+        }
+    ]
+}
