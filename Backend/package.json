@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "dist/app.js",
   "scripts": {
-    "dev": "nodemon --exec ts-node app.ts",
+    "dev": "npx prisma generate && nodemon --exec ts-node app.ts",
     "build": "tsc",
     "start": "node dist/app.js",
     "lint": "eslint . --ext .ts,.tsx",
@@ -17,7 +17,9 @@
   "dependencies": {
     "@prisma/client": "^5.10.0",
     "cors": "^2.8.5",
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "express-jwt": "^8.5.1",
+    "jwks-rsa": "^3.2.2"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",

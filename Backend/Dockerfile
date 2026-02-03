@@ -8,6 +8,9 @@ WORKDIR /app
 # Copiar archivos de dependencias
 COPY package*.json ./
 
+# Instalar dependencias del sistema
+RUN apk add --no-cache openssl
+
 # Instalar dependencias (incluyendo devDependencies para desarrollo)
 RUN npm ci
 
@@ -17,6 +20,8 @@ RUN npm ci
 FROM node:20-alpine AS development
 
 WORKDIR /app
+
+RUN apk add --no-cache openssl
 
 # Copiar dependencias desde la etapa anterior
 COPY --from=dependencies /app/node_modules ./node_modules
@@ -44,6 +49,7 @@ COPY --from=dependencies /app/node_modules ./node_modules
 COPY . .
 
 # Compilar TypeScript
+RUN npx prisma generate
 RUN npm run build
 
 # ============================================
@@ -52,6 +58,8 @@ RUN npm run build
 FROM node:20-alpine AS production
 
 WORKDIR /app
+
+RUN apk add --no-cache openssl
 
 # Instalar solo dependencias de producción
 COPY package*.json ./

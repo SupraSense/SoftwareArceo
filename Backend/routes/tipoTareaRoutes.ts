@@ -1,12 +1,22 @@
 import { Router } from 'express';
 import * as tipoTareaController from '../controllers/tipoTareaController';
+import { checkJwt, requireRole } from '../middleware/authMiddleware';
 
 const router = Router();
 
-router.get('/', tipoTareaController.getAll);
-router.get('/:id', tipoTareaController.getById);
-router.post('/', tipoTareaController.create);
-router.put('/:id', tipoTareaController.update);
-router.delete('/:id', tipoTareaController.remove);
+// Retrieve all - Authenticated only
+router.get('/', checkJwt, tipoTareaController.getAll);
+
+// Read one - Authenticated only
+router.get('/:id', checkJwt, tipoTareaController.getById);
+
+// Create - Admin only
+router.post('/', checkJwt, requireRole('admin'), tipoTareaController.create);
+
+// Update - Admin only
+router.put('/:id', checkJwt, requireRole('admin'), tipoTareaController.update);
+
+// Delete - Admin only
+router.delete('/:id', checkJwt, requireRole('admin'), tipoTareaController.remove);
 
 export default router;

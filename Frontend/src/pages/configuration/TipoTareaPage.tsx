@@ -19,7 +19,6 @@ export const TipoTareaPage: React.FC = () => {
             setTipos(data);
         } catch (error) {
             console.error('Error fetching tipos de tarea:', error);
-            // Ideally use a toast notification here
             alert('Error al cargar tipos de tarea');
         } finally {
             setIsLoading(false);
@@ -110,53 +109,51 @@ export const TipoTareaPage: React.FC = () => {
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="border-b border-gray-100 bg-gray-50/50">
-                                <th className="py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider w-24">ID</th>
-                                <th className="py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Nombre</th>
-                                <th className="py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right w-48">Acciones</th>
+                            <tr className="border-b border-gray-100 bg-white">
+                                <th className="py-4 px-6 text-sm font-semibold text-gray-500 uppercase tracking-wider">Nombre</th>
+                                <th className="py-4 px-6 text-sm font-semibold text-gray-500 uppercase tracking-wider text-right">Acciones</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
                             {isLoading ? (
                                 <tr>
-                                    <td colSpan={3} className="py-8 text-center text-gray-500">
+                                    <td colSpan={2} className="py-8 text-center text-gray-500">
                                         Cargando...
                                     </td>
                                 </tr>
                             ) : tipos.length === 0 ? (
                                 <tr>
-                                    <td colSpan={3} className="py-8 text-center text-gray-500">
+                                    <td colSpan={2} className="py-8 text-center text-gray-500">
                                         No hay tipos de tarea registrados
                                     </td>
                                 </tr>
                             ) : (
                                 tipos.map((tipo) => (
                                     <tr key={tipo.id} className="hover:bg-gray-50/50 transition-colors group">
-                                        <td className="py-4 px-6 text-sm text-gray-500 font-medium">
-                                            {tipo.id}
-                                        </td>
-                                        <td className="py-4 px-6 text-sm text-gray-900 font-medium">
+                                        <td className="py-4 px-6 text-sm text-gray-900 font-bold">
                                             {tipo.nombre}
                                         </td>
-                                        <td className="py-4 px-6 text-right space-x-2">
-                                            <Button
-                                                size="sm"
-                                                variant="ghost"
-                                                onClick={() => handleEdit(tipo)}
-                                                className="text-gray-500 hover:text-blue-600 hover:bg-blue-50"
-                                                leftIcon={<Pencil size={14} />}
-                                            >
-                                                Editar
-                                            </Button>
-                                            <Button
-                                                size="sm"
-                                                variant="danger"
-                                                onClick={() => handleDelete(tipo.id)}
-                                                className="bg-red-500 hover:bg-red-600 text-white shadow-sm"
-                                                leftIcon={<Trash2 size={14} />}
-                                            >
-                                                Eliminar
-                                            </Button>
+                                        <td className="py-4 px-6 text-right">
+                                            <div className="flex items-center justify-end gap-2">
+                                                <Button
+                                                    size="sm"
+                                                    variant="secondary"
+                                                    onClick={() => handleEdit(tipo)}
+                                                    className="bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 shadow-sm"
+                                                    leftIcon={<Pencil size={16} />}
+                                                >
+                                                    Editar
+                                                </Button>
+                                                <Button
+                                                    size="sm"
+                                                    variant="danger"
+                                                    onClick={() => handleDelete(tipo.id)}
+                                                    className="bg-red-500 hover:bg-red-600 text-white shadow-sm"
+                                                    leftIcon={<Trash2 size={16} />}
+                                                >
+                                                    Eliminar
+                                                </Button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))

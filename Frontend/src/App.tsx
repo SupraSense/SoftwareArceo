@@ -33,7 +33,7 @@ function App() {
         {/* Rutas Protegidas */}
         <Route element={<AuthLayout />}>
           <Route path="/app" element={<Home />} />
-          <Route path="/app/configuration/task-types" element={<TipoTareaPage />} />
+          <Route path="/app/configuration/type-task" element={<TipoTareaPage />} />
         </Route>
 
         {/* Fallback */}

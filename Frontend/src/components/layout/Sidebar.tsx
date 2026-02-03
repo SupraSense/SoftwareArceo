@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import {
     LayoutDashboard,
     ClipboardList,
@@ -24,6 +24,7 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ className = '', onClose }) => {
+    const location = useLocation();
     const navItems = [
         { name: 'Inicio', icon: LayoutDashboard, path: '/app', active: true },
         { name: 'Órdenes de Trabajo', icon: ClipboardList, path: '/app/orders' },
@@ -41,7 +42,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ className = '', onClose }) => 
     ];
 
     const configItems = [
-        { name: 'Tipos de Tareas', icon: Settings, path: '/app/configuration/task-types' },
+        { name: 'Tipos de Tareas', icon: Settings, path: '/app/configuration/type-task' },
     ];
 
     return (
@@ -76,9 +77,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ className = '', onClose }) => 
                                 ? 'bg-primary-50 text-primary-700'
                                 : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}
             `}
-                        onClick={(e) => {
+                        onClick={() => {
                             if (onClose) onClose();
-                            if (item.path !== '/dashboard') e.preventDefault();
+                            // Removed preventDefault to allow navigation
                         }}
                     >
                         <item.icon className={`mr-3 h-5 w-5 ${item.name === 'Inicio' ? 'text-primary-600' : 'text-gray-400 group-hover:text-gray-500'}`} />
@@ -89,18 +90,20 @@ export const Sidebar: React.FC<SidebarProps> = ({ className = '', onClose }) => 
                 <div className="pt-6 pb-6">
                     <p className="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Configuración</p>
                     {configItems.map((item) => (
-                        <a
+                        <NavLink
                             key={item.name}
-                            href="#"
-                            className="flex items-center px-3 py-2 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-50 hover:text-gray-900"
-                            onClick={(e) => {
-                                e.preventDefault();
+                            to={item.path}
+                            className={({ isActive }) => `
+                                flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors
+                                ${isActive ? 'bg-primary-50 text-primary-700' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}
+                            `}
+                            onClick={() => {
                                 if (onClose) onClose();
                             }}
                         >
-                            <item.icon className="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500" />
+                            <item.icon className={`mr-3 h-5 w-5 ${item.name === 'Tipos de Tareas' && location.pathname.includes('type-task') ? 'text-primary-600' : 'text-gray-400 group-hover:text-gray-500'}`} />
                             {item.name}
-                        </a>
+                        </NavLink>
                     ))}
                 </div>
             </nav>

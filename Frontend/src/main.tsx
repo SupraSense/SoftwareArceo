@@ -1,10 +1,14 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { ReactKeycloakProvider } from '@react-keycloak/web'
+import keycloak from './auth/keycloak'
 import './index.css'
 import App from './App.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <ReactKeycloakProvider authClient={keycloak}>
+      <App />
+    </ReactKeycloakProvider>
   </StrictMode>,
 )

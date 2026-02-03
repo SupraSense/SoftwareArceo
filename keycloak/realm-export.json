@@ -33,5 +33,22 @@
                 "http://localhost:5173"
             ]
         }
+    ],
+    "users": [
+        {
+            "username": "admin",
+            "enabled": true,
+            "email": "suprasense111@gmail.com",
+            "emailVerified": true,
+            "credentials": [
+                {
+                    "type": "password",
+                    "value": "12345"
+                }
+            ],
+            "realmRoles": [
+                "admin"
+            ]
+        }
     ]
 }
