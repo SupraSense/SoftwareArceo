@@ -24,8 +24,17 @@ export const checkJwt = expressjwt({
         jwksUri: 'http://suprasense-keycloak:8080/realms/SoftwareArceo/protocol/openid-connect/certs'
     }) as GetVerificationKey,
 
-    issuer: 'http://localhost:8080/realms/SoftwareArceo',
-    algorithms: ['RS256']
+    issuer: [
+        'http://localhost:8080/realms/SoftwareArceo',
+        'http://suprasense-keycloak:8080/realms/SoftwareArceo'
+    ],
+    algorithms: ['RS256'],
+    getToken: (req: Request) => {
+        if (req.cookies && req.cookies.access_token) {
+            return req.cookies.access_token;
+        }
+        return null;
+    }
 });
 
 export const requireRole = (role: string) => {

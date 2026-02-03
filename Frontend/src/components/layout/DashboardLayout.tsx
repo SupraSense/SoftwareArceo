@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Sidebar } from './Sidebar';
 import { Bell, PanelLeft } from 'lucide-react';
 import { Outlet } from 'react-router-dom';
+import { authService } from '../../auth/authService';
 
 export const DashboardLayout: React.FC = () => {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -36,6 +37,12 @@ export const DashboardLayout: React.FC = () => {
                             onClick={() => setMenuOpen(true)}
                         >
                             <PanelLeft size={24} />
+                        </button>
+                        <button
+                            onClick={() => authService.logout()}
+                            className="text-sm text-red-600 hover:text-red-800 font-medium"
+                        >
+                            Cerrar Sesión
                         </button>
                     </div>
 

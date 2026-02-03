@@ -1,21 +1,40 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Lock, Mail, ArrowRight } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { Lock, Mail, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
+import { authService } from '../../auth/authService';
+
+type LoginFormInputs = {
+    email: string;
+    password: string;
+};
 
 export const Login: React.FC = () => {
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [loginError, setLoginError] = useState<string | null>(null);
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm<LoginFormInputs>();
+
+    const onSubmit = async (data: LoginFormInputs) => {
         setIsLoading(true);
-        // Simulación de login - Preparado para Keycloak
-        setTimeout(() => {
-            setIsLoading(false);
+        setLoginError(null);
+        try {
+            await authService.login(data.email, data.password);
             navigate('/app');
-        }, 1500);
+        } catch (error) {
+            console.error('Login failed', error);
+            setLoginError('Credenciales inválidas. Por favor intente nuevamente.');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -28,20 +47,37 @@ export const Login: React.FC = () => {
                         <p className="mt-2 text-text-secondary">Ingrese sus credenciales para acceder</p>
                     </div>
 
-                    <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+                    <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-6">
                         <Input
                             label="Correo Electrónico"
                             type="email"
                             placeholder="usuario@suprasense.com"
                             icon={<Mail className="w-5 h-5" />}
+                            {...register('email', { required: 'El email es requerido' })}
+                            error={errors.email?.message}
                         />
 
                         <div className="space-y-1">
                             <Input
                                 label="Contraseña"
-                                type="password"
+                                type={showPassword ? 'text' : 'password'}
                                 placeholder="••••••••"
                                 icon={<Lock className="w-5 h-5" />}
+                                rightElement={
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="focus:outline-none hover:text-text-primary"
+                                    >
+                                        {showPassword ? (
+                                            <EyeOff className="w-5 h-5" />
+                                        ) : (
+                                            <Eye className="w-5 h-5" />
+                                        )}
+                                    </button>
+                                }
+                                {...register('password', { required: 'La contraseña es requerida' })}
+                                error={errors.password?.message}
                             />
                             <div className="flex justify-end">
                                 <a href="#" className="text-sm font-medium text-primary-600 hover:text-primary-500">
@@ -49,6 +85,12 @@ export const Login: React.FC = () => {
                                 </a>
                             </div>
                         </div>
+
+                        {loginError && (
+                            <div className="p-3 bg-red-50 border border-red-200 rounded-md text-red-600 text-sm">
+                                {loginError}
+                            </div>
+                        )}
 
                         <Button
                             type="submit"

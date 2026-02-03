@@ -11,12 +11,11 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@react-keycloak/web": "^3.4.0",
     "axios": "^1.13.4",
-    "keycloak-js": "^26.2.2",
     "lucide-react": "^0.563.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "react-hook-form": "^7.71.1",
     "react-router-dom": "^7.13.0"
   },
   "devDependencies": {

@@ -65,7 +65,7 @@ export const Landing: React.FC = () => {
 
             <footer className="bg-surface border-t border-border py-8">
                 <div className="max-w-7xl mx-auto px-4 text-center text-text-tertiary">
-                    © 2024 SoftwareArceo SGO. Desarrollado para SupraSense.
+                    © 2026 SoftwareArceo. Desarrollado por SupraSense.
                 </div>
             </footer>
         </div>

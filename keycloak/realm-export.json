@@ -25,7 +25,10 @@
         {
             "clientId": "sgo-frontend",
             "enabled": true,
-            "publicClient": true,
+            "publicClient": false,
+            "secret": "my-secret-key-123",
+            "directAccessGrantsEnabled": true,
+            "serviceAccountsEnabled": true,
             "redirectUris": [
                 "http://localhost:5173/*"
             ],
@@ -40,10 +43,13 @@
             "enabled": true,
             "email": "suprasense111@gmail.com",
             "emailVerified": true,
+            "firstName": "Admin",
+            "lastName": "Principal",
             "credentials": [
                 {
                     "type": "password",
-                    "value": "12345"
+                    "value": "12345",
+                    "temporary": false
                 }
             ],
             "realmRoles": [

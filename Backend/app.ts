@@ -2,16 +2,22 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 // Routes
 import tipoTareaRoutes from './routes/tipoTareaRoutes';
+import authRoutes from './routes/authRoutes';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middlewares
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:5173',
+    credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(require('cookie-parser')());
 
 
+app.use('/api/auth', authRoutes);
 app.use('/api/tipo-tarea', tipoTareaRoutes);
 app.get('/', (_req: Request, res: Response) => {
     res.send('Hello world');
