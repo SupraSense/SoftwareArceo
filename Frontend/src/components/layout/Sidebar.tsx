@@ -46,15 +46,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ className = '', onClose }) => 
     ];
 
     return (
-        <div className={`w-64 bg-white flex flex-col border-r border-gray-200 overflow-y-auto ${className}`}>
+        <div className={`w-64 bg-white dark:bg-gray-900 flex flex-col border-r border-gray-200 dark:border-gray-800 overflow-y-auto duration-200 transition-colors ${className}`}>
             {/* Header Logo */}
-            <div className="min-h-16 h-16 flex items-center justify-between px-6 border-b border-gray-100 shrink-0 sticky top-0 bg-white z-10">
+            <div className="min-h-16 h-16 flex items-center justify-between px-6 border-b border-gray-100 dark:border-gray-800 shrink-0 sticky top-0 bg-white dark:bg-gray-900 z-10 duration-200 transition-colors">
                 <div className="flex items-center">
                     <div className="w-8 h-8 bg-primary-900 rounded-lg flex items-center justify-center mr-3 text-white">
                         <Building2 size={18} />
                     </div>
                     <div>
-                        <h1 className="font-bold text-gray-900 leading-tight">Arceo</h1>
+                        <h1 className="font-bold text-gray-900 dark:text-white leading-tight">Arceo</h1>
                     </div>
                 </div>
                 {onClose && (
@@ -74,8 +74,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ className = '', onClose }) => 
                         className={({ isActive }) => `
               flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors
               ${isActive || item.active // Hack for this demo
-                                ? 'bg-primary-50 text-primary-700'
-                                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}
+                                ? 'bg-primary-50 dark:bg-primary-900/40 text-primary-700 dark:text-primary-300'
+                                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-200'}
             `}
                         onClick={() => {
                             if (onClose) onClose();
@@ -95,7 +95,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ className = '', onClose }) => 
                             to={item.path}
                             className={({ isActive }) => `
                                 flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors
-                                ${isActive ? 'bg-primary-50 text-primary-700' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}
+                                ${isActive ? 'bg-primary-50 dark:bg-primary-900/40 text-primary-700 dark:text-primary-300' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-200'}
                             `}
                             onClick={() => {
                                 if (onClose) onClose();

@@ -90,6 +90,7 @@ services:
       target: development
     container_name: suprasense-backend
     restart: unless-stopped
+    command: sh -c "/app/entrypoint.sh"
     environment:
       NODE_ENV: development
       PORT: 3000

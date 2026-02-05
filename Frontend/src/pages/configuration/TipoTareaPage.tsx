@@ -79,11 +79,11 @@ export const TipoTareaPage: React.FC = () => {
         <div className="space-y-6 p-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
                         <Settings className="w-6 h-6" />
                         Configuración de Tipos de Tareas
                     </h1>
-                    <p className="text-gray-500 mt-1">
+                    <p className="text-gray-500 dark:text-gray-400 mt-1">
                         Gestione los tipos de tareas disponibles para las órdenes de trabajo
                     </p>
                 </div>
@@ -96,12 +96,12 @@ export const TipoTareaPage: React.FC = () => {
                 </Button>
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="p-6 border-b border-gray-100">
-                    <h2 className="text-lg font-semibold text-gray-900">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+                <div className="p-6 border-b border-gray-100 dark:border-gray-700">
+                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
                         Tipos de Tareas Disponibles
                     </h2>
-                    <p className="text-sm text-gray-500 mt-1">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                         Total: {tipos.length} tipo(s) de tarea configurado(s)
                     </p>
                 </div>
@@ -109,12 +109,12 @@ export const TipoTareaPage: React.FC = () => {
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="border-b border-gray-100 bg-white">
-                                <th className="py-4 px-6 text-sm font-semibold text-gray-500 uppercase tracking-wider">Nombre</th>
-                                <th className="py-4 px-6 text-sm font-semibold text-gray-500 uppercase tracking-wider text-right">Acciones</th>
+                            <tr className="border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800">
+                                <th className="py-4 px-6 text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Nombre</th>
+                                <th className="py-4 px-6 text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider text-right">Acciones</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-100">
+                        <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                             {isLoading ? (
                                 <tr>
                                     <td colSpan={2} className="py-8 text-center text-gray-500">
@@ -129,8 +129,8 @@ export const TipoTareaPage: React.FC = () => {
                                 </tr>
                             ) : (
                                 tipos.map((tipo) => (
-                                    <tr key={tipo.id} className="hover:bg-gray-50/50 transition-colors group">
-                                        <td className="py-4 px-6 text-sm text-gray-900 font-bold">
+                                    <tr key={tipo.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition-colors group">
+                                        <td className="py-4 px-6 text-sm text-gray-900 dark:text-gray-200 font-bold">
                                             {tipo.nombre}
                                         </td>
                                         <td className="py-4 px-6 text-right">
@@ -139,7 +139,7 @@ export const TipoTareaPage: React.FC = () => {
                                                     size="sm"
                                                     variant="secondary"
                                                     onClick={() => handleEdit(tipo)}
-                                                    className="bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 shadow-sm"
+                                                    className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 shadow-sm"
                                                     leftIcon={<Pencil size={16} />}
                                                 >
                                                     Editar

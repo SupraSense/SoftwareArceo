@@ -4,6 +4,7 @@ import { Login } from './pages/auth/Login';
 import { ProtectedRoute } from './auth/ProtectedRoute';
 import { Home } from './pages/dashboard/Home';
 import { TipoTareaPage } from './pages/configuration/TipoTareaPage';
+import { Clients } from './pages/dashboard/Clients';
 import { DashboardLayout } from './components/layout/DashboardLayout';
 
 
@@ -22,6 +23,7 @@ function App() {
           <Route element={<DashboardLayout />}>
             <Route path="/app" element={<Home />} />
             <Route path="/app/configuration/type-task" element={<TipoTareaPage />} />
+            <Route path="/app/clients" element={<Clients />} />
           </Route>
         </Route>
 

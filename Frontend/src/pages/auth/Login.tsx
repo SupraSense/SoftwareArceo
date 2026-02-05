@@ -5,6 +5,7 @@ import { Lock, Mail, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { authService } from '../../auth/authService';
+import { ForceLightMode } from '../../components/ui/ForceLightMode';
 
 type LoginFormInputs = {
     email: string;
@@ -39,6 +40,7 @@ export const Login: React.FC = () => {
 
     return (
         <div className="min-h-screen grid lg:grid-cols-2">
+            <ForceLightMode />
             {/* Sección Izquierda - Formulario */}
             <div className="flex items-center justify-center p-8 bg-surface">
                 <div className="w-full max-w-md space-y-8">

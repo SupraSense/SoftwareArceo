@@ -2,12 +2,14 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BarChart3, ShieldCheck, Users } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
+import { ForceLightMode } from '../../components/ui/ForceLightMode';
 
 export const Landing: React.FC = () => {
     const navigate = useNavigate();
 
     return (
         <div className="min-h-screen bg-surface-secondary flex flex-col">
+            <ForceLightMode />
             {/* Navbar simplificado */}
             <nav className="bg-surface/80 backdrop-blur-md border-b border-border sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
@@ -27,12 +29,12 @@ export const Landing: React.FC = () => {
             <main className="flex-grow">
                 <section className="relative overflow-hidden pt-16 pb-24">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                        <h1 className="text-4xl md:text-6xl font-display font-bold text-text-primary mb-6 animate-fade-in">
-                            Sistema de Gestión Operativa de Arceo<br />
-
-                            <span className="text-primary-600">Centralizado e Inteligente</span>
+                        <h1 className="text-text-primary-600 text-4xl md:text-6xl font-display font-bold">
+                            Sistema de Gestión Operativa de Arceo
+                            <br />
+                            <span className="text-text-primary-600">Centralizado e Inteligente</span>
                         </h1>
-                        <p className="max-w-3xl mx-auto text-xl text-text-secondary mb-10 leading-relaxed">
+                        <p className="max-w-3xl mx-auto text-xl text-text-primary-600 mb-10 leading-relaxed">
                             Digitalice y centralice la gestión de órdenes, recursos y personal.
                             Elimine la fragmentación de información y obtenga visibilidad total en tiempo real.
                         </p>

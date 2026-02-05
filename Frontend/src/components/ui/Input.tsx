@@ -11,7 +11,7 @@ export const Input: React.FC<InputProps> = ({ label, error, icon, rightElement, 
     return (
         <div className="w-full">
             {label && (
-                <label className="block text-sm font-medium text-text-secondary mb-1">
+                <label className="block text-sm font-medium text-text-secondary dark:text-gray-300 mb-1">
                     {label}
                 </label>
             )}
@@ -24,6 +24,7 @@ export const Input: React.FC<InputProps> = ({ label, error, icon, rightElement, 
                 <input
                     className={`
             w-full rounded-lg border border-border bg-surface text-text-primary 
+            dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:placeholder-gray-500 
             focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-shadow
             placeholder:text-text-tertiary
             ${icon ? 'pl-10' : 'pl-4'}

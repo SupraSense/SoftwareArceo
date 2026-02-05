@@ -54,14 +54,14 @@ export const TipoTareaForm: React.FC<TipoTareaFormProps> = ({
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-            <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden transform transition-all">
-                <div className="flex items-center justify-between p-4 border-b border-gray-100">
-                    <h3 className="text-lg font-semibold text-gray-900">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-md overflow-hidden transform transition-all">
+                <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-700">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                         {initialData ? 'Editar Tipo de Tarea' : 'Nuevo Tipo de Tarea'}
                     </h3>
                     <button
                         onClick={onClose}
-                        className="p-1 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors"
+                        className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                     >
                         <X size={20} />
                     </button>
