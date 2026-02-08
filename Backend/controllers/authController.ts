@@ -2,14 +2,13 @@ import { Request, Response } from 'express';
 import axios from 'axios';
 import qs from 'qs';
 
-const KEYCLOAK_URL = 'http://suprasense-keycloak:8080';
-const REALM = 'SoftwareArceo';
-const CLIENT_ID = 'sgo-frontend';
-const CLIENT_SECRET = process.env.KEYCLOAK_CLIENT_SECRET || '';
+const KEYCLOAK_URL = process.env.KEYCLOAK_URL || 'http://localhost:8080';
+const REALM = process.env.KEYCLOAK_REALM || 'SoftwareArceo';
+const CLIENT_ID = process.env.KEYCLOAK_CLIENT_ID || 'sgo-frontend';
+const CLIENT_SECRET = process.env.KEYCLOAK_CLIENT_SECRET || 'my-secret-key-123';
 
 export const login = async (req: Request, res: Response) => {
     try {
-        // Frontend sends 'email' but Keycloak expects 'username' (which can be email)
         const { email, password } = req.body;
 
         const data = qs.stringify({
@@ -31,7 +30,7 @@ export const login = async (req: Request, res: Response) => {
 
         const { access_token, refresh_token, expires_in, refresh_expires_in } = response.data;
 
-        // Set HttpOnly Cookies
+        // Configuración de seguridad de cookies para SupraSense
         res.cookie('access_token', access_token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
@@ -46,8 +45,7 @@ export const login = async (req: Request, res: Response) => {
             maxAge: (refresh_expires_in || 3600) * 1000
         });
 
-        // Decode token to get user info without external library
-        // The access_token is a JWT
+        // Decodificación segura del JWT para la sesión
         let user = { email };
         try {
             const parts = access_token.split('.');
@@ -64,11 +62,9 @@ export const login = async (req: Request, res: Response) => {
 
     } catch (error: any) {
         if (error.response) {
-            console.error('Keycloak Login Error:', error.response.data);
-            // Log full error details for debugging if needed
-            // console.error(JSON.stringify(error.response.data, null, 2));
+            console.error('Keycloak Login Error Details:', error.response.data);
         } else {
-            console.error('Login Error:', error.message);
+            console.error('Login Connectivity Error:', error.message);
         }
         res.status(401).json({ success: false, message: 'Authentication failed' });
     }

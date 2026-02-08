@@ -6,6 +6,7 @@ import { Home } from './pages/dashboard/Home';
 import { TipoTareaPage } from './pages/configuration/TipoTareaPage';
 import { Clients } from './pages/dashboard/Clients';
 import { DashboardLayout } from './components/layout/DashboardLayout';
+import { InProgress } from './pages/misc/InProgress';
 
 
 
@@ -24,6 +25,19 @@ function App() {
             <Route path="/app" element={<Home />} />
             <Route path="/app/configuration/type-task" element={<TipoTareaPage />} />
             <Route path="/app/clients" element={<Clients />} />
+
+            {/* Rutas en Implementación */}
+            <Route path="/app/orders" element={<InProgress />} />
+            <Route path="/app/kanban" element={<InProgress />} />
+            <Route path="/app/remitos" element={<InProgress />} />
+            <Route path="/app/agenda" element={<InProgress />} />
+            <Route path="/app/messages" element={<InProgress />} />
+            <Route path="/app/reports" element={<InProgress />} />
+            <Route path="/app/resources" element={<InProgress />} />
+            <Route path="/app/staff" element={<InProgress />} />
+            <Route path="/app/drivers" element={<InProgress />} />
+            <Route path="/app/workshops" element={<InProgress />} />
+            <Route path="/app/billing" element={<InProgress />} />
           </Route>
         </Route>
 

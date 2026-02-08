@@ -33,6 +33,7 @@ export const Login: React.FC = () => {
         } catch (error) {
             console.error('Login failed', error);
             setLoginError('Credenciales inválidas. Por favor intente nuevamente.');
+            setTimeout(() => setLoginError(null), 10000);
         } finally {
             setIsLoading(false);
         }
@@ -118,7 +119,7 @@ export const Login: React.FC = () => {
                 <div className="relative z-10 p-12 text-white max-w-lg">
                     <h3 className="text-3xl font-bold mb-4">Eficiencia Operativa</h3>
                     <p className="text-primary-100 text-lg">
-                        "La plataforma SGO nos permite escalar nuestras operaciones con confianza, garantizando precisión en cada paso del proceso."
+                        "La plataforma SGO nos permite monitorear y optimizar nuestros procesos para mejorar la eficiencia operativa."
                     </p>
                 </div>
             </div>

@@ -1,6 +1,11 @@
 import { expressjwt, GetVerificationKey } from 'express-jwt';
 import jwksRsa from 'jwks-rsa';
 import { Request, Response, NextFunction } from 'express';
+import 'dotenv/config'; // Asegura la carga de variables
+
+// Definimos las constantes basadas en el .env que ya tenés
+const KEYCLOAK_URL = process.env.KEYCLOAK_URL || 'http://localhost:8080';
+const REALM = process.env.KEYCLOAK_REALM || 'SoftwareArceo';
 
 declare global {
     namespace Express {
@@ -21,12 +26,13 @@ export const checkJwt = expressjwt({
         cache: true,
         rateLimit: true,
         jwksRequestsPerMinute: 5,
-        jwksUri: 'http://suprasense-keycloak:8080/realms/SoftwareArceo/protocol/openid-connect/certs'
+        jwksUri: `${KEYCLOAK_URL}/realms/${REALM}/protocol/openid-connect/certs`
     }) as GetVerificationKey,
 
     issuer: [
-        'http://localhost:8080/realms/SoftwareArceo',
-        'http://suprasense-keycloak:8080/realms/SoftwareArceo'
+        `${KEYCLOAK_URL}/realms/${REALM}`,
+        `http://localhost:8080/realms/${REALM}`,
+        `http://suprasense-keycloak:8080/realms/${REALM}`
     ],
     algorithms: ['RS256'],
     getToken: (req: Request) => {
