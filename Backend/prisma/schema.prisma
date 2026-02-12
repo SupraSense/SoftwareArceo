@@ -45,3 +45,13 @@ model Contract {
   client   Client  @relation(fields: [clientId], references: [id])
   isActive Boolean @default(true)
 }
+
+model User {
+  id        String  @id 
+  email     String  @unique
+  firstName String?
+  lastName  String?
+  dni       String?
+  address   String?
+  role      String?
+}

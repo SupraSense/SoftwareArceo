@@ -4,13 +4,14 @@ import type { Client } from '../../types/client';
 import { ClientDetailModal } from '../../components/clients/ClientDetailModal';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
-import { Phone, Mail, FileText, Eye, Filter, Search } from 'lucide-react';
+import { Phone, Mail, FileText, Eye, Search } from 'lucide-react';
 
 export const Clients = () => {
     const [clients, setClients] = useState<Client[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedClient, setSelectedClient] = useState<Client | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
         loadClients();
@@ -37,6 +38,10 @@ export const Clients = () => {
         }
     };
 
+    const filteredClients = clients.filter(client =>
+        client.razonSocial.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     if (loading) {
         return <div className="p-6">Cargando clientes...</div>;
     }
@@ -51,24 +56,23 @@ export const Clients = () => {
                 <Button onClick={() => { setSelectedClient(null); setIsModalOpen(true); }}>+ Nuevo Cliente</Button>
             </div>
 
-            <div className="flex gap-4 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm">
+            <div className="flex bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm">
                 <div className="relative flex-1">
                     <Search className="absolute left-3 top-2.5 text-gray-400" size={20} />
                     <input
                         type="text"
-                        placeholder="Buscar por razón social o CUIT..."
+                        placeholder="Buscar por razón social..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
                         className="w-full pl-10 pr-4 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                 </div>
-                <Button variant="outline" className="flex gap-2">
-                    <Filter size={16} /> Filtros
-                </Button>
             </div>
 
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
                 <div className="p-4 border-b dark:border-gray-700">
                     <h2 className="text-lg font-semibold flex items-center gap-2 text-gray-900 dark:text-white">
-                        <FileText size={20} /> Lista de Clientes ({clients.length})
+                        <FileText size={20} /> Lista de Clientes ({filteredClients.length})
                     </h2>
                 </div>
                 <div className="overflow-x-auto">
@@ -85,7 +89,7 @@ export const Clients = () => {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
-                            {clients.map(client => (
+                            {filteredClients.map(client => (
                                 <tr key={client.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
                                     <td className="p-4 font-medium text-gray-900 dark:text-white">{client.razonSocial}</td>
                                     <td className="p-4 text-gray-500 dark:text-gray-400">{client.cuit}</td>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import {
     LayoutDashboard,
     ClipboardList,
@@ -24,9 +24,8 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ className = '', onClose }) => {
-    const location = useLocation();
     const navItems = [
-        { name: 'Inicio', icon: LayoutDashboard, path: '/app', active: true },
+        { name: 'Inicio', icon: LayoutDashboard, path: '/app' },
         { name: 'Órdenes de Trabajo', icon: ClipboardList, path: '/app/orders' },
         { name: 'Tareas Kanban', icon: Trello, path: '/app/kanban' },
         { name: 'Bandeja Remitos', icon: Inbox, path: '/app/remitos' },
@@ -71,9 +70,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ className = '', onClose }) => 
                     <NavLink
                         key={item.name}
                         to={item.path}
+                        end={item.path === '/app'}
                         className={({ isActive }) => `
               flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors
-              ${isActive || item.active // Hack for this demo
+              ${isActive
                                 ? 'bg-primary-50 dark:bg-primary-900/40 text-primary-700 dark:text-primary-300'
                                 : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-200'}
             `}
@@ -82,8 +82,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ className = '', onClose }) => 
                             // Removed preventDefault to allow navigation
                         }}
                     >
-                        <item.icon className={`mr-3 h-5 w-5 ${item.name === 'Inicio' ? 'text-primary-600' : 'text-gray-400 group-hover:text-gray-500'}`} />
-                        {item.name}
+                        {({ isActive }) => (
+                            <>
+                                <item.icon className={`mr-3 h-5 w-5 ${isActive ? 'text-primary-600' : 'text-gray-400 group-hover:text-gray-500'}`} />
+                                {item.name}
+                            </>
+                        )}
                     </NavLink>
                 ))}
 
@@ -101,8 +105,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ className = '', onClose }) => 
                                 if (onClose) onClose();
                             }}
                         >
-                            <item.icon className={`mr-3 h-5 w-5 ${item.name === 'Tipos de Tareas' && location.pathname.includes('type-task') ? 'text-primary-600' : 'text-gray-400 group-hover:text-gray-500'}`} />
-                            {item.name}
+                            {({ isActive }) => (
+                                <>
+                                    <item.icon className={`mr-3 h-5 w-5 ${isActive ? 'text-primary-600' : 'text-gray-400 group-hover:text-gray-500'}`} />
+                                    {item.name}
+                                </>
+                            )}
                         </NavLink>
                     ))}
                 </div>

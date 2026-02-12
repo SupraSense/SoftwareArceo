@@ -54,9 +54,17 @@ export const ClientDetailModal: React.FC<ClientDetailModalProps> = ({ client, is
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm transition-opacity">
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden mx-4 transform transition-all">
-                <div className="flex justify-between items-center p-6 border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            {/* Backdrop with blur effect */}
+            <div
+                className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+                onClick={onClose}
+                aria-hidden="true"
+            />
+
+            {/* Modal Content */}
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden transform transition-all relative z-10 flex flex-col max-h-[90vh]">
+                <div className="flex justify-between items-center p-6 border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 flex-shrink-0">
                     <h2 className="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
                         {renderHeader()}
                     </h2>
@@ -65,7 +73,7 @@ export const ClientDetailModal: React.FC<ClientDetailModalProps> = ({ client, is
                     </button>
                 </div>
 
-                <div className="p-6">
+                <div className="p-6 overflow-y-auto custom-scrollbar">
                     {deleteConfirm ? (
                         <div className="text-center py-6 space-y-4">
                             <div className="mx-auto bg-red-100 dark:bg-red-900/30 p-4 rounded-full w-16 h-16 flex items-center justify-center">
@@ -140,7 +148,7 @@ export const ClientDetailModal: React.FC<ClientDetailModalProps> = ({ client, is
                 </div>
 
                 {!isEditing && !deleteConfirm && (
-                    <div className="p-6 bg-gray-50 dark:bg-gray-800/50 border-t dark:border-gray-700 flex justify-end gap-3">
+                    <div className="p-6 bg-gray-50 dark:bg-gray-800/50 border-t dark:border-gray-700 flex justify-end gap-3 flex-shrink-0">
                         <Button variant="danger" onClick={() => setDeleteConfirm(true)} leftIcon={<Trash2 size={18} />}>
                             Eliminar
                         </Button>

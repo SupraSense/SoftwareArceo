@@ -5,6 +5,7 @@ import { ProtectedRoute } from './auth/ProtectedRoute';
 import { Home } from './pages/dashboard/Home';
 import { TipoTareaPage } from './pages/configuration/TipoTareaPage';
 import { Clients } from './pages/dashboard/Clients';
+import { Profile } from './pages/dashboard/Profile';
 import { DashboardLayout } from './components/layout/DashboardLayout';
 import { InProgress } from './pages/misc/InProgress';
 
@@ -25,6 +26,7 @@ function App() {
             <Route path="/app" element={<Home />} />
             <Route path="/app/configuration/type-task" element={<TipoTareaPage />} />
             <Route path="/app/clients" element={<Clients />} />
+            <Route path="/app/profile" element={<Profile />} />
 
             {/* Rutas en Implementación */}
             <Route path="/app/orders" element={<InProgress />} />

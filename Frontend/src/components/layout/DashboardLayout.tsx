@@ -1,12 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Sidebar } from './Sidebar';
-import { Bell, PanelLeft } from 'lucide-react';
-import { Outlet } from 'react-router-dom';
+import { Bell, PanelLeft, User, LogOut } from 'lucide-react';
+import { Outlet, Link } from 'react-router-dom';
 import { authService } from '../../auth/authService';
 import { ThemeToggle } from '../ui/ThemeToggle';
 
 export const DashboardLayout: React.FC = () => {
     const [menuOpen, setMenuOpen] = useState(false);
+    const [profileOpen, setProfileOpen] = useState(false);
+    const [initials, setInitials] = useState('LA');
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const data = await authService.checkAuth();
+                if (data.authenticated && data.user) {
+                    const u = data.user;
+                    const first = (u.firstName || u.given_name || '').charAt(0).toUpperCase();
+                    const last = (u.lastName || u.family_name || '').charAt(0).toUpperCase();
+                    setInitials(first + last || 'U');
+                }
+            } catch (error) {
+                console.error('Error fetching user for initials:', error);
+            }
+        };
+        fetchUser();
+    }, []);
 
     return (
         <div className="h-screen bg-gray-50 dark:bg-gray-950 flex overflow-hidden">
@@ -39,12 +58,6 @@ export const DashboardLayout: React.FC = () => {
                         >
                             <PanelLeft size={24} />
                         </button>
-                        <button
-                            onClick={() => authService.logout()}
-                            className="text-sm text-red-600 hover:text-red-800 font-medium"
-                        >
-                            Cerrar Sesión
-                        </button>
                     </div>
 
                     <div className="flex items-center gap-4">
@@ -53,8 +66,43 @@ export const DashboardLayout: React.FC = () => {
                             <Bell size={20} />
                             <span className="absolute top-1.5 right-1.5 h-2 w-2 bg-red-500 rounded-full border border-white dark:border-gray-900"></span>
                         </button>
-                        <div className="h-8 w-8 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center text-primary-700 dark:text-primary-300 font-bold border border-primary-200 dark:border-primary-700/50">
-                            LA
+
+                        <div className="relative">
+                            <button
+                                onClick={() => setProfileOpen(!profileOpen)}
+                                className="h-8 w-8 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center text-primary-700 dark:text-primary-300 font-bold border border-primary-200 dark:border-primary-700/50 hover:bg-primary-200 transition-colors"
+                            >
+                                {initials}
+                            </button>
+
+                            {profileOpen && (
+                                <>
+                                    <div
+                                        className="fixed inset-0 z-30"
+                                        onClick={() => setProfileOpen(false)}
+                                    ></div>
+                                    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-1 border border-gray-200 dark:border-gray-700 z-40">
+                                        <div className="px-4 py-2 border-b border-gray-100 dark:border-gray-700">
+                                            <p className="text-sm font-medium text-gray-900 dark:text-white">Mi Cuenta</p>
+                                        </div>
+                                        <Link
+                                            to="/app/profile"
+                                            className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2"
+                                            onClick={() => setProfileOpen(false)}
+                                        >
+                                            <User size={16} />
+                                            Mi Perfil
+                                        </Link>
+                                        <button
+                                            onClick={() => authService.logout()}
+                                            className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2"
+                                        >
+                                            <LogOut size={16} />
+                                            Cerrar Sesión
+                                        </button>
+                                    </div>
+                                </>
+                            )}
                         </div>
                     </div>
                 </header>
