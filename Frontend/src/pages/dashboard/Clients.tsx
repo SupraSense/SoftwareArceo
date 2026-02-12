@@ -48,7 +48,7 @@ export const Clients = () => {
                     <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Gestión de Clientes</h1>
                     <p className="text-gray-500 dark:text-gray-400">Administra la información de tus clientes petroleros</p>
                 </div>
-                <Button>+ Nuevo Cliente</Button>
+                <Button onClick={() => { setSelectedClient(null); setIsModalOpen(true); }}>+ Nuevo Cliente</Button>
             </div>
 
             <div className="flex gap-4 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm">
@@ -121,6 +121,7 @@ export const Clients = () => {
                 client={selectedClient}
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
+                onClientUpdated={loadClients}
             />
         </div>
     );

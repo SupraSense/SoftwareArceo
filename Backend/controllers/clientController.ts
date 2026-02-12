@@ -92,3 +92,17 @@ export const update = async (req: Request, res: Response) => {
         return res.status(500).json({ message: 'Error updating client', error });
     }
 };
+
+export const deleteClient = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    try {
+        await clientService.deleteClient(id); // Ensure deleteClient exists in service
+        return res.status(204).send();
+    } catch (error: any) {
+        if (error.message === "Client not found") {
+            return res.status(404).json({ message: "Client not found" });
+        }
+        console.error('Error deleting client:', error);
+        return res.status(500).json({ message: 'Error deleting client', error });
+    }
+};

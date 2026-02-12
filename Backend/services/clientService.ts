@@ -4,6 +4,13 @@ const prisma = new PrismaClient();
 
 export const getAllClients = async () => {
     return await prisma.client.findMany({
+        where: {
+            status: {
+                name: {
+                    not: 'Inactivo'
+                }
+            }
+        },
         include: {
             status: true,
             contacts: true,
@@ -103,5 +110,26 @@ export const updateClient = async (id: string, data: any) => {
                 select: { contracts: { where: { isActive: true } } }
             }
         }
+    });
+};
+
+export const deleteClient = async (id: string) => {
+    const client = await prisma.client.findUnique({
+        where: { id },
+        include: { contracts: true }
+    });
+
+    if (!client) {
+        throw new Error("Client not found");
+    }
+
+    // Logical deletion (Inactivo) for ALL clients as per new requirement
+    let inactiveStatus = await prisma.clientStatus.findUnique({ where: { name: 'Inactivo' } });
+    if (!inactiveStatus) {
+        inactiveStatus = await prisma.clientStatus.create({ data: { name: 'Inactivo' } });
+    }
+    return await prisma.client.update({
+        where: { id },
+        data: { statusId: inactiveStatus.id }
     });
 };

@@ -3,14 +3,21 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-    // 1. Create Statuses
+    console.log('Poblando la base de datos');
+    // 1. Crear registros estado
     const statusVal = await prisma.clientStatus.upsert({
         where: { name: 'Activo' },
         update: {},
         create: { name: 'Activo' }
     });
+    const status2 = await prisma.clientStatus.upsert({
+        where: { name: 'Inactivo' },
+        update: {},
+        create: { name: 'Inactivo' }
+    });
+    console.log({ "Estados creados": statusVal, status2 });
 
-    // 2. Client YPF
+    // 2. Crear Clientes
     const ypf = await prisma.client.upsert({
         where: { cuit: '30-54668997-9' },
         update: {},
@@ -35,8 +42,6 @@ async function main() {
             }
         }
     });
-
-    // 3. Client Shell
     const shell = await prisma.client.upsert({
         where: { cuit: '30-50003815-4' },
         update: {},
@@ -60,8 +65,6 @@ async function main() {
             }
         }
     });
-
-    // 4. Client Total Austral
     const total = await prisma.client.upsert({
         where: { cuit: '30-62605802-9' },
         update: {},
@@ -84,8 +87,25 @@ async function main() {
             }
         }
     });
+    console.log({ "Clientes creados": ypf, shell, total });
 
-    console.log({ ypf, shell, total });
+    // 3. Crear Tipos de Tarea
+    const taskTypes = [
+        'Entrega',
+        'Devolución',
+        'DTM',
+        'Cambio',
+        'Taller móvil',
+        'Mantenimiento preventivo'
+    ];
+    for (const type of taskTypes) {
+        await prisma.tipoTarea.upsert({
+            where: { nombre: type },
+            update: {},
+            create: { nombre: type }
+        });
+    }
+    console.log({ "Tipos de Tarea creados": taskTypes });
 }
 
 main()

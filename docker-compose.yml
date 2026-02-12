@@ -67,23 +67,6 @@ services:
       timeout: 5s
       retries: 10
 
-  prisma-studio:
-    image: node:20-alpine
-    container_name: suprasense-prisma-studio
-    working_dir: /app
-    command: sh -c "apk add --no-cache openssl && echo \"DATABASE_URL=$DATABASE_URL\" > .env && npx prisma studio --browser none --port 5555"
-    environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
-    ports:
-      - "5555:5555"
-    volumes:
-      - ./Backend:/app
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - suprasense-network
-
   # Backend API (Node.js + Express)
   backend:
     build:
