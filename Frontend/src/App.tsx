@@ -8,6 +8,8 @@ import { Clients } from './pages/dashboard/Clients';
 import { Profile } from './pages/dashboard/Profile';
 import { DashboardLayout } from './components/layout/DashboardLayout';
 import { InProgress } from './pages/misc/InProgress';
+import { Staff } from './pages/dashboard/Staff';
+import { StaffDetail } from './pages/dashboard/StaffDetail';
 
 
 
@@ -36,7 +38,10 @@ function App() {
             <Route path="/app/messages" element={<InProgress />} />
             <Route path="/app/reports" element={<InProgress />} />
             <Route path="/app/resources" element={<InProgress />} />
-            <Route path="/app/staff" element={<InProgress />} />
+            <Route path="/app/resources" element={<InProgress />} />
+            <Route path="/app/staff" element={<Staff />} />
+            <Route path="/app/staff/:id" element={<StaffDetail />} />
+            <Route path="/app/drivers" element={<InProgress />} />
             <Route path="/app/drivers" element={<InProgress />} />
             <Route path="/app/workshops" element={<InProgress />} />
             <Route path="/app/billing" element={<InProgress />} />

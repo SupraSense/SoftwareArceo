@@ -5,6 +5,7 @@ import cors from 'cors';
 import tipoTareaRoutes from './routes/tipoTareaRoutes';
 import authRoutes from './routes/authRoutes';
 import clientRoutes from './routes/clientRoutes';
+import personalRoutes from './routes/personalRoutes';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -22,6 +23,7 @@ app.use(require('cookie-parser')());
 app.use('/api/auth', authRoutes);
 app.use('/api/tipo-tarea', tipoTareaRoutes);
 app.use('/api/clients', clientRoutes);
+app.use('/api/personal', personalRoutes);
 app.get('/', (_req: Request, res: Response) => {
     res.send('Hello world');
 });

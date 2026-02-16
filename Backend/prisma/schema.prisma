@@ -24,6 +24,33 @@ model Client {
   contracts   Contract[]
 }
 
+model Personal {
+  id            Int            @id @default(autoincrement())
+  nombre        String
+  apellido      String
+  email         String         @unique
+  telefono      String?
+  areaId        Int
+  area          AreaPersonal   @relation(fields: [areaId], references: [id])
+  statusId      Int
+  status        PersonalStatus @relation(fields: [statusId], references: [id])
+  fecha_ingreso DateTime
+  created_at    DateTime       @default(now())
+  updated_at    DateTime       @updatedAt
+}
+
+model PersonalStatus {
+  id       Int        @id @default(autoincrement())
+  nombre   String     @unique
+  personal Personal[]
+}
+
+model AreaPersonal {
+  id       Int        @id @default(autoincrement())
+  nombre   String     @unique
+  personal Personal[]
+}
+
 model ClientStatus {
   id      String   @id @default(uuid())
   name    String   @unique
