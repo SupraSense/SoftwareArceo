@@ -1,17 +1,15 @@
 import React from 'react';
 import type { Personal } from '../../types/personal';
-import { Eye, Pencil, Phone, Mail } from 'lucide-react';
+import { Phone, Mail } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Loader } from '../ui/Loader';
 
 interface StaffListProps {
     staff: Personal[];
     loading: boolean;
-    onEdit: (personal: Personal) => void;
-    onView: (personal: Personal) => void;
 }
 
-export const StaffList: React.FC<StaffListProps> = ({ staff, loading, onEdit }) => {
+export const StaffList: React.FC<StaffListProps> = ({ staff, loading }) => {
     const navigate = useNavigate();
 
     if (loading) {
@@ -53,12 +51,13 @@ export const StaffList: React.FC<StaffListProps> = ({ staff, loading, onEdit }) 
                             <th className="px-6 py-3">Estado</th>
                             <th className="px-6 py-3">Contacto</th>
                             <th className="px-6 py-3 text-center">OT Activas</th>
-                            <th className="px-6 py-3 text-right">Acciones</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                         {staff.map((employee) => (
-                            <tr key={employee.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
+                            <tr key={employee.id}
+                                onClick={() => navigate(`/app/staff/${employee.id}`)}
+                                className="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors cursor-pointer">
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <span className="font-medium text-gray-900 dark:text-gray-100">{employee.nombre} {employee.apellido}</span>
                                 </td>
@@ -89,24 +88,6 @@ export const StaffList: React.FC<StaffListProps> = ({ staff, loading, onEdit }) 
                                     <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 text-xs font-medium text-slate-600 dark:text-slate-300">
                                         {Math.floor(Math.random() * 3)}
                                     </span>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-right">
-                                    <div className="flex justify-end gap-2">
-                                        <button
-                                            onClick={() => navigate(`/app/staff/${employee.id}`)}
-                                            className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
-                                            title="Ver Detalle"
-                                        >
-                                            <Eye size={18} />
-                                        </button>
-                                        <button
-                                            onClick={() => onEdit(employee)}
-                                            className="p-1.5 rounded-lg text-gray-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
-                                            title="Editar"
-                                        >
-                                            <Pencil size={18} />
-                                        </button>
-                                    </div>
                                 </td>
                             </tr>
                         ))}

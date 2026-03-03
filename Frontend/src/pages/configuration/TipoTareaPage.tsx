@@ -5,6 +5,8 @@ import type { TipoTarea } from '../../types/tipoTarea';
 import { Button } from '../../components/ui/Button';
 import { TipoTareaForm } from '../../components/tipoTarea/TipoTareaForm';
 import { Loader } from '../../components/ui/Loader';
+import { useNotification } from '../../hooks/useNotification';
+import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
 
 export const TipoTareaPage: React.FC = () => {
     const [tipos, setTipos] = useState<TipoTarea[]>([]);
@@ -12,6 +14,11 @@ export const TipoTareaPage: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingItem, setEditingItem] = useState<TipoTarea | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const { showSuccess, showValidationError, showServerError } = useNotification();
+
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+    const [deletingId, setDeletingId] = useState<number | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     const fetchTipos = async () => {
         try {
@@ -19,8 +26,7 @@ export const TipoTareaPage: React.FC = () => {
             const data = await tipoTareaService.getAll();
             setTipos(data);
         } catch (error) {
-            console.error('Error fetching tipos de tarea:', error);
-            alert('Error al cargar tipos de tarea');
+            showServerError(error, 'Error al cargar tipos de tarea');
         } finally {
             setIsLoading(false);
         }
@@ -40,16 +46,30 @@ export const TipoTareaPage: React.FC = () => {
         setIsModalOpen(true);
     };
 
-    const handleDelete = async (id: number) => {
-        if (!window.confirm('¿Está seguro de eliminar este tipo de tarea?')) return;
+    const handleDeleteClick = (id: number) => {
+        setDeletingId(id);
+        setIsDeleteDialogOpen(true);
+    };
 
+    const handleConfirmDelete = async () => {
+        if (deletingId === null) return;
+        setIsDeleting(true);
         try {
-            await tipoTareaService.delete(id);
+            await tipoTareaService.delete(deletingId);
+            showSuccess('Tipo de tarea eliminado correctamente');
             fetchTipos();
         } catch (error) {
-            console.error('Error deleting tipo de tarea:', error);
-            alert('Error al eliminar');
+            showServerError(error, 'Error al eliminar el tipo de tarea');
+        } finally {
+            setIsDeleting(false);
+            setIsDeleteDialogOpen(false);
+            setDeletingId(null);
         }
+    };
+
+    const handleCancelDelete = () => {
+        setIsDeleteDialogOpen(false);
+        setDeletingId(null);
     };
 
     const handleSubmit = async (data: { nombre: string }) => {
@@ -57,18 +77,19 @@ export const TipoTareaPage: React.FC = () => {
         try {
             if (editingItem) {
                 await tipoTareaService.update(editingItem.id, data);
+                showSuccess('Tipo de tarea actualizado correctamente');
             } else {
                 await tipoTareaService.create(data);
+                showSuccess('Tipo de tarea creado correctamente');
             }
-            await fetchTipos();
+            fetchTipos();
             setIsModalOpen(false);
         } catch (error) {
-            console.error('Error submitting form:', error);
-            // @ts-ignore
-            if (error.response?.status === 409) {
-                alert('Ya existe un tipo de tarea con ese nombre');
+            const errorObj = error as any;
+            if (errorObj.response?.status === 409) {
+                showValidationError('Ya existe un tipo de tarea con ese nombre');
             } else {
-                alert('Error al guardar');
+                showServerError(error, 'Error al guardar el tipo de tarea');
             }
             throw error; // Re-throw to keep form open if handled by form
         } finally {
@@ -91,7 +112,7 @@ export const TipoTareaPage: React.FC = () => {
                 <Button
                     onClick={handleCreate}
                     leftIcon={<Plus size={18} />}
-                    className="bg-[#1e293b] hover:bg-[#334155] text-white" // Custom dark color from image
+                    className="bg-[#1e293b] hover:bg-[#334155] text-white"
                 >
                     Nuevo Tipo de Tarea
                 </Button>
@@ -148,7 +169,7 @@ export const TipoTareaPage: React.FC = () => {
                                                 <Button
                                                     size="sm"
                                                     variant="danger"
-                                                    onClick={() => handleDelete(tipo.id)}
+                                                    onClick={() => handleDeleteClick(tipo.id)}
                                                     className="bg-red-500 hover:bg-red-600 text-white shadow-sm"
                                                     leftIcon={<Trash2 size={16} />}
                                                 >
@@ -170,6 +191,17 @@ export const TipoTareaPage: React.FC = () => {
                 onSubmit={handleSubmit}
                 initialData={editingItem}
                 isLoading={isSubmitting}
+            />
+
+            <ConfirmDialog
+                isOpen={isDeleteDialogOpen}
+                title="Eliminar Tipo de Tarea"
+                description="¿Estás seguro que deseas eliminar este tipo de tarea? Esta acción es permanente."
+                isHardDelete={true}
+                onConfirm={handleConfirmDelete}
+                onCancel={handleCancelDelete}
+                confirmText="Eliminar"
+                isLoading={isDeleting}
             />
         </div>
     );

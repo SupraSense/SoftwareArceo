@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Sidebar } from './Sidebar';
-import { Bell, PanelLeft, User, LogOut } from 'lucide-react';
+import { PanelLeft, User, LogOut } from 'lucide-react';
 import { Outlet, Link } from 'react-router-dom';
 import { authService } from '../../auth/authService';
 import { ThemeToggle } from '../ui/ThemeToggle';
@@ -8,6 +8,7 @@ import { ThemeToggle } from '../ui/ThemeToggle';
 export const DashboardLayout: React.FC = () => {
     const [menuOpen, setMenuOpen] = useState(false);
     const [profileOpen, setProfileOpen] = useState(false);
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
     const [initials, setInitials] = useState('LA');
 
     useEffect(() => {
@@ -30,8 +31,12 @@ export const DashboardLayout: React.FC = () => {
     return (
         <div className="h-screen bg-gray-50 dark:bg-gray-950 flex overflow-hidden">
             {/* Sidebar Desktop - Static Flex Item */}
-            <div className="hidden md:flex md:w-64 flex-col fixed inset-y-0 z-50">
-                <Sidebar className="h-full" />
+            <div className={`hidden md:flex flex-col fixed inset-y-0 z-50 ${isSidebarCollapsed ? 'w-20' : 'w-64'} transition-all duration-300`}>
+                <Sidebar
+                    className="h-full w-full"
+                    isCollapsed={isSidebarCollapsed}
+                    onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+                />
             </div>
 
             {/* Sidebar Mobile - Overlay */}
@@ -48,7 +53,7 @@ export const DashboardLayout: React.FC = () => {
             )}
 
             {/* Main Content */}
-            <div className="flex-1 flex flex-col md:pl-64 h-screen w-full">
+            <div className={`flex-1 flex flex-col ${isSidebarCollapsed ? 'md:pl-20' : 'md:pl-64'} h-screen w-full transition-all duration-300`}>
                 {/* Top Header */}
                 <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 h-16 flex items-center justify-between px-6 sticky top-0 z-20 shrink-0 transition-colors duration-200">
                     <div className="flex items-center gap-4">
@@ -62,11 +67,6 @@ export const DashboardLayout: React.FC = () => {
 
                     <div className="flex items-center gap-4">
                         <ThemeToggle />
-                        <button className="relative p-2 text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 rounded-full transition-colors">
-                            <Bell size={20} />
-                            <span className="absolute top-1.5 right-1.5 h-2 w-2 bg-red-500 rounded-full border border-white dark:border-gray-900"></span>
-                        </button>
-
                         <div className="relative">
                             <button
                                 onClick={() => setProfileOpen(!profileOpen)}

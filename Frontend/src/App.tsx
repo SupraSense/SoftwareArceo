@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'sonner';
 import { Landing } from './pages/publicPage/Landing';
 import { Login } from './pages/auth/Login';
 import { ProtectedRoute } from './auth/ProtectedRoute';
@@ -17,6 +18,7 @@ import { StaffDetail } from './pages/features/personal/PersonalDetailPage';
 function App() {
   return (
     <BrowserRouter>
+      <Toaster richColors position="top-right" />
       <Routes>
         {/* Rutas Públicas */}
         <Route path="/" element={<Landing />} />

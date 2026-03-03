@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import type { Personal } from '../../types/personal';
 import api from '../../services/api';
-import { X, Save, AlertCircle } from 'lucide-react';
+import { User, Mail, Phone, Calendar, Briefcase } from 'lucide-react';
+import { Input } from '../ui/Input';
+import { Button } from '../ui/Button';
+import { useNotification } from '../../hooks/useNotification';
 
 interface StaffFormProps {
-    isOpen: boolean;
-    onClose: () => void;
+    onCancel: () => void;
     onSubmit: () => void;
     initialData?: Personal | null;
 }
 
-export const StaffForm: React.FC<StaffFormProps> = ({ isOpen, onClose, onSubmit, initialData }) => {
+export const PersonalForm: React.FC<StaffFormProps> = ({ onCancel, onSubmit, initialData }) => {
     const [formData, setFormData] = useState({
         nombre: '',
         apellido: '',
@@ -20,7 +22,7 @@ export const StaffForm: React.FC<StaffFormProps> = ({ isOpen, onClose, onSubmit,
         estado: 'Disponible',
         fecha_ingreso: new Date().toISOString().split('T')[0]
     });
-    const [error, setError] = useState<string | null>(null);
+    const { showSuccess, showValidationError, showServerError } = useNotification();
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -37,155 +39,109 @@ export const StaffForm: React.FC<StaffFormProps> = ({ isOpen, onClose, onSubmit,
         }
     }, [initialData]);
 
-    if (!isOpen) return null;
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        setError(null);
 
         try {
             if (initialData) {
                 await api.put(`/personal/${initialData.id}`, formData);
+                showSuccess('Personal actualizado correctamente');
             } else {
                 await api.post('/personal', formData);
+                showSuccess('Personal registrado correctamente');
             }
             onSubmit();
         } catch (err: any) {
-            // Handle generic or specific errors (like duplicate email)
+            const status = err.response?.status;
             const msg = err.response?.data?.error || err.response?.data?.message || 'Ocurrió un error al guardar.';
-            setError(msg);
+            if (status === 400 || status === 403 || status === 404) {
+                showValidationError(msg);
+            } else {
+                showServerError(err, msg);
+            }
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto transition-colors">
-                <div className="flex justify-between items-center p-6 border-b border-gray-100 dark:border-gray-700">
-                    <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                        {initialData ? 'Editar Personal' : 'Registrar Nuevo Personal'}
-                    </h2>
-                    <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
-                        <X size={24} />
-                    </button>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Input
+                    label="Nombre *"
+                    icon={<User size={18} />}
+                    required
+                    value={formData.nombre}
+                    onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
+                />
+
+                <Input
+                    label="Apellido *"
+                    icon={<User size={18} />}
+                    required
+                    value={formData.apellido}
+                    onChange={(e) => setFormData({ ...formData, apellido: e.target.value })}
+                />
+
+                <Input
+                    label="Email *"
+                    icon={<Mail size={18} />}
+                    type="email"
+                    required
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                />
+
+                <Input
+                    label="Teléfono"
+                    icon={<Phone size={18} />}
+                    type="tel"
+                    value={formData.telefono}
+                    onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
+                />
+
+                <div className="w-full">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Área *
+                    </label>
+                    <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">
+                            <Briefcase size={18} />
+                        </div>
+                        <select
+                            className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white text-gray-900 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow pl-10 pr-4 py-2"
+                            value={formData.area}
+                            onChange={(e) => setFormData({ ...formData, area: e.target.value })}
+                        >
+                            <option value="Logística">Logística</option>
+                            <option value="Módulos">Módulos</option>
+                            <option value="Periféricos">Periféricos</option>
+                        </select>
+                    </div>
                 </div>
 
-                <form onSubmit={handleSubmit} className="p-6 space-y-6">
-                    {error && (
-                        <div className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-4 rounded-lg flex items-center gap-2 text-sm">
-                            <AlertCircle size={16} />
-                            {error}
-                        </div>
-                    )}
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Nombre *</label>
-                            <input
-                                required
-                                type="text"
-                                className="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors placeholder-gray-400 dark:placeholder-gray-500"
-                                value={formData.nombre}
-                                onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Apellido *</label>
-                            <input
-                                required
-                                type="text"
-                                className="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
-                                value={formData.apellido}
-                                onChange={(e) => setFormData({ ...formData, apellido: e.target.value })}
-                            />
-                        </div>
-
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Email *</label>
-                            <input
-                                required
-                                type="email"
-                                className="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
-                                value={formData.email}
-                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Teléfono</label>
-                            <input
-                                type="tel"
-                                className="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
-                                value={formData.telefono}
-                                onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
-                            />
-                        </div>
-
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Área *</label>
-                            <select
-                                className="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
-                                value={formData.area}
-                                onChange={(e) => setFormData({ ...formData, area: e.target.value })}
-                            >
-                                <option value="Logística">Logística</option>
-                                <option value="Módulos">Módulos</option>
-                                <option value="Periféricos">Periféricos</option>
-                            </select>
-                        </div>
-
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Estado Inicial *</label>
-                            <select
-                                className="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
-                                value={formData.estado}
-                                onChange={(e) => setFormData({ ...formData, estado: e.target.value })}
-                                disabled={!initialData} // Create defaults to 'Disponible' but allow edit
-                            >
-                                <option value="Disponible">Disponible</option>
-                                <option value="En Servicio">En Servicio</option>
-                                <option value="Licencia">Licencia</option>
-                            </select>
-                        </div>
-
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Fecha de Ingreso *</label>
-                            <input
-                                required
-                                type="date"
-                                className="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors [color-scheme:light] dark:[color-scheme:dark]"
-                                value={formData.fecha_ingreso}
-                                onChange={(e) => setFormData({ ...formData, fecha_ingreso: e.target.value })}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="flex justify-end gap-3 pt-6 border-t border-gray-100 dark:border-gray-700">
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                        >
-                            Cancelar
-                        </button>
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="px-4 py-2 bg-slate-900 dark:bg-slate-700 text-white rounded-lg hover:bg-slate-800 dark:hover:bg-slate-600 flex items-center gap-2 transition-colors disabled:opacity-50"
-                        >
-                            {loading ? (
-                                <>Wait...</>
-                            ) : (
-                                <>
-                                    <Save size={18} />
-                                    {initialData ? 'Guardar Cambios' : 'Registrar'}
-                                </>
-                            )}
-                        </button>
-                    </div>
-                </form>
+                <Input
+                    label="Fecha de Ingreso *"
+                    icon={<Calendar size={18} />}
+                    type="date"
+                    required
+                    className="[color-scheme:light] dark:[color-scheme:dark]"
+                    value={formData.fecha_ingreso}
+                    onChange={(e) => setFormData({ ...formData, fecha_ingreso: e.target.value })}
+                />
             </div>
-        </div>
+
+            <div className="flex justify-end space-x-3 pt-6 border-t dark:border-gray-700">
+                <Button type="button" variant="outline" onClick={onCancel} disabled={loading}>
+                    Cancelar
+                </Button>
+                <Button type="submit" isLoading={loading}>
+                    {initialData ? 'Guardar Cambios' : 'Registrar Personal'}
+                </Button>
+            </div>
+        </form>
     );
 };

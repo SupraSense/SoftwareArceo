@@ -5,6 +5,7 @@ import { ClientForm } from '../../../components/clients/ClientForm';
 import { Badge } from '../../../components/ui/Badge';
 import { Button } from '../../../components/ui/Button';
 import { Loader } from '../../../components/ui/Loader';
+import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
 import type { Client } from '../../../types/client';
 import type { ClientFormData } from '../../../schemasZod/clientSchema';
 import { ArrowLeft, Edit2, Trash2, Building2 } from 'lucide-react';
@@ -12,10 +13,12 @@ import { ArrowLeft, Edit2, Trash2, Building2 } from 'lucide-react';
 export const ClientDetailPage = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const { getClient, saveClient, deleteClient, loading, error } = useClients();
+    const { getClient, saveClient, deleteClient, loading } = useClients();
 
     const [client, setClient] = useState<Client | null>(null);
     const [isEditing, setIsEditing] = useState(id === 'new');
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     useEffect(() => {
         const fetchClient = async () => {
@@ -34,18 +37,24 @@ export const ClientDetailPage = () => {
         const success = await saveClient(formData, id === 'new' ? undefined : id);
         if (success) {
             navigate('/app/clients');
-        } else {
-            alert(error || 'Ocurrió un error al guardar');
         }
     };
 
-    const handleDelete = async () => {
+    const handleDeleteClick = () => {
+        setIsDeleteDialogOpen(true);
+    };
+
+    const handleConfirmDelete = async () => {
         if (!id || !client) return;
-        const confirmDelete = window.confirm(`¿Estás seguro de eliminar a ${client.razonSocial}?`);
-        if (confirmDelete) {
-            const success = await deleteClient(id);
-            if (success) navigate('/app/clients');
-        }
+        setIsDeleting(true);
+        const success = await deleteClient(id);
+        setIsDeleting(false);
+        setIsDeleteDialogOpen(false);
+        if (success) navigate('/app/clients');
+    };
+
+    const handleCancelDelete = () => {
+        setIsDeleteDialogOpen(false);
     };
 
     const handleCancelEdit = () => {
@@ -79,7 +88,7 @@ export const ClientDetailPage = () => {
                 </div>
                 {!isEditing && client && (
                     <div className="flex gap-2">
-                        <Button variant="danger" onClick={handleDelete} disabled={loading}>
+                        <Button variant="danger" onClick={handleDeleteClick} disabled={loading}>
                             <Trash2 size={18} className="mr-2" /> Eliminar
                         </Button>
                         <Button variant="primary" onClick={() => setIsEditing(true)}>
@@ -141,6 +150,17 @@ export const ClientDetailPage = () => {
                     </div>
                 ) : null}
             </div>
+
+            <ConfirmDialog
+                isOpen={isDeleteDialogOpen}
+                title="Eliminar Cliente"
+                description={`¿Estás seguro que deseas eliminar el cliente "${client?.razonSocial}"?`}
+                isHardDelete={false}
+                onConfirm={handleConfirmDelete}
+                onCancel={handleCancelDelete}
+                confirmText="Eliminar"
+                isLoading={isDeleting}
+            />
         </div>
     );
 };

@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { StaffList } from '../../../components/personal/PersonalList';
-import { StaffForm } from '../../../components/personal/PersonalForm';
 import type { Personal, PersonalFilters } from '../../../types/personal';
 import api from '../../../services/api';
 import { Plus, Search, Filter, X, Users, CheckCircle, Clock, UserX } from 'lucide-react';
 
 export const Staff = () => {
+    const navigate = useNavigate();
     const [staff, setStaff] = useState<Personal[]>([]);
     const [loading, setLoading] = useState(true);
     const [filters, setFilters] = useState<PersonalFilters>({
@@ -13,10 +14,6 @@ export const Staff = () => {
         estado: 'Todos',
         area: 'Todas'
     });
-
-    // Modals state
-    const [isFormOpen, setIsFormOpen] = useState(false);
-    const [selectedStaff, setSelectedStaff] = useState<Personal | null>(null);
 
     const fetchStaff = async () => {
         setLoading(true);
@@ -39,21 +36,6 @@ export const Staff = () => {
         fetchStaff();
     }, [filters]);
 
-    const handleCreate = () => {
-        setSelectedStaff(null);
-        setIsFormOpen(true);
-    };
-
-    const handleEdit = (personal: Personal) => {
-        setSelectedStaff(personal);
-        setIsFormOpen(true);
-    };
-
-    const handleFormSubmit = () => {
-        setIsFormOpen(false);
-        fetchStaff(); // Refresh list
-    };
-
     // KPI calculations
     const totalPersonal = staff.length;
     const availablePersonal = staff.filter(p => p.estado === 'Disponible').length;
@@ -69,8 +51,8 @@ export const Staff = () => {
                     <p className="text-gray-500 dark:text-gray-400">Administración de recursos humanos y asignaciones</p>
                 </div>
                 <button
-                    onClick={handleCreate}
-                    className="bg-slate-900 dark:bg-slate-700 text-white px-4 py-2 rounded-lg hover:bg-slate-800 dark:hover:bg-slate-600 flex items-center gap-2 transition-colors"
+                    onClick={() => navigate('/app/staff/new')}
+                    className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors font-medium shadow-sm hover:shadow-md"
                 >
                     <Plus size={20} />
                     Nuevo Personal
@@ -172,23 +154,10 @@ export const Staff = () => {
                 </div>
             </div>
 
-            {/* List */}
             <StaffList
                 staff={staff}
                 loading={loading}
-                onEdit={handleEdit}
-                onView={() => { }}
             />
-
-            {/* Modals */}
-            {isFormOpen && (
-                <StaffForm
-                    isOpen={isFormOpen}
-                    onClose={() => setIsFormOpen(false)}
-                    onSubmit={handleFormSubmit}
-                    initialData={selectedStaff}
-                />
-            )}
         </div>
     );
 };

@@ -6,6 +6,12 @@ const api = axios.create({
     withCredentials: true
 });
 
+api.interceptors.request.use(async (config) => {
+    // Artificial delay to improve UX
+    await new Promise(resolve => setTimeout(resolve, 350));
+    return config;
+});
+
 api.interceptors.response.use(
     (response) => response,
     (error) => {

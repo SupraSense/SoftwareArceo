@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { authService } from '../../../auth/authService';
-import { User, Save, AlertCircle } from 'lucide-react';
+import { User, Save } from 'lucide-react';
 import { Loader } from '../../../components/ui/Loader';
+import { useNotification } from '../../../hooks/useNotification';
+import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
 
 interface ProfileForm {
     id: string;
@@ -18,7 +20,10 @@ export const Profile: React.FC = () => {
     const { register, handleSubmit, setValue, formState: { errors } } = useForm<ProfileForm>();
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
-    const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+    const { showSuccess, showServerError, showValidationError } = useNotification();
+
+    const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+    const [pendingData, setPendingData] = useState<ProfileForm | null>(null);
 
     useEffect(() => {
         fetchProfile();
@@ -38,27 +43,41 @@ export const Profile: React.FC = () => {
                 setValue('role', u.role || 'User');
             }
         } catch (err) {
-            console.error(err);
-            setMessage({ type: 'error', text: 'Error al cargar perfil' });
+            showServerError(err, 'Error al cargar el perfil');
         } finally {
             setLoading(false);
         }
     };
 
-    const onSubmit = async (data: ProfileForm) => {
-        if (!window.confirm('¿Está seguro de guardar los cambios?')) return;
+    const onSubmitClick = (data: ProfileForm) => {
+        setPendingData(data);
+        setIsConfirmOpen(true);
+    };
 
+    const handleConfirmSubmit = async () => {
+        if (!pendingData) return;
+        setIsConfirmOpen(false);
         setSaving(true);
-        setMessage(null);
         try {
-            await authService.updateProfile(data);
-            setMessage({ type: 'success', text: 'Perfil actualizado correctamente' });
+            await authService.updateProfile(pendingData);
+            showSuccess('Perfil actualizado correctamente');
         } catch (err: any) {
-            console.error(err);
-            setMessage({ type: 'error', text: err.response?.data?.message || 'Error al actualizar perfil' });
+            const errorMsg = err.response?.data?.message || 'Error al actualizar perfil';
+            const status = err.response?.status;
+            if (status === 400 || status === 403 || status === 404) {
+                showValidationError(errorMsg);
+            } else {
+                showServerError(err, errorMsg);
+            }
         } finally {
             setSaving(false);
+            setPendingData(null);
         }
+    };
+
+    const handleCancelSubmit = () => {
+        setIsConfirmOpen(false);
+        setPendingData(null);
     };
 
     if (loading) return <Loader message="Cargando perfil..." />;
@@ -75,19 +94,12 @@ export const Profile: React.FC = () => {
                 </div>
             </div>
 
-            {message && (
-                <div className={`p-4 mb-6 rounded-lg flex items-center gap-2 ${message.type === 'success' ? 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400'}`}>
-                    <AlertCircle size={20} />
-                    {message.text}
-                </div>
-            )}
-
             <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden">
                 <div className="p-6 border-b border-gray-200 dark:border-gray-800">
                     <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Información Personal</h2>
                 </div>
 
-                <form onSubmit={handleSubmit(onSubmit)} className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <form onSubmit={handleSubmit(onSubmitClick)} className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Nombre */}
                     <div className="space-y-2">
                         <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Nombre *</label>
@@ -182,6 +194,15 @@ export const Profile: React.FC = () => {
                     </div>
                 </form>
             </div>
+
+            <ConfirmDialog
+                isOpen={isConfirmOpen}
+                title="Guardar Cambios"
+                description="¿Estás seguro que deseas actualizar tu perfil con esta información?"
+                onConfirm={handleConfirmSubmit}
+                onCancel={handleCancelSubmit}
+                confirmText="Actualizar"
+            />
         </div>
     );
 };

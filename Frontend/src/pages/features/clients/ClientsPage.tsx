@@ -5,7 +5,7 @@ import type { Client } from '../../../types/client';
 import { Badge } from '../../../components/ui/Badge';
 import { Button } from '../../../components/ui/Button';
 import { Loader } from '../../../components/ui/Loader';
-import { Phone, Mail, FileText, Eye, Search } from 'lucide-react';
+import { Phone, Mail, FileText, Search } from 'lucide-react';
 
 export const Clients = () => {
     const [clients, setClients] = useState<Client[]>([]);
@@ -83,12 +83,14 @@ export const Clients = () => {
                                 <th className="p-4 font-medium">Comunicación</th>
                                 <th className="p-4 font-medium">Contratos</th>
                                 <th className="p-4 font-medium">Estado</th>
-                                <th className="p-4 font-medium">Acciones</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                             {filteredClients.map(client => (
-                                <tr key={client.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                                <tr key={client.id}
+                                    onClick={() => handleViewClient(client.id)}
+                                    className="hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors"
+                                >
                                     <td className="p-4 font-medium text-gray-900 dark:text-white">{client.razonSocial}</td>
                                     <td className="p-4 text-gray-500 dark:text-gray-400">{client.cuit}</td>
                                     <td className="p-4 text-gray-900 dark:text-gray-200">{client.contactName || '-'}</td>
@@ -104,14 +106,6 @@ export const Clients = () => {
                                     </td>
                                     <td className="p-4">
                                         <Badge variant={client.status === 'Activo' ? 'success' : 'default'}>{client.status}</Badge>
-                                    </td>
-                                    <td className="p-4">
-                                        <button
-                                            onClick={() => handleViewClient(client.id)}
-                                            className="text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 flex items-center gap-1 text-sm font-medium"
-                                        >
-                                            <Eye size={16} /> Ver
-                                        </button>
                                     </td>
                                 </tr>
                             ))}
