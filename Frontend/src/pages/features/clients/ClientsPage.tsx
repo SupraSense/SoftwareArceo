@@ -1,17 +1,17 @@
 import { useEffect, useState } from 'react';
-import { clientService } from '../../services/clientService';
-import type { Client } from '../../types/client';
-import { ClientDetailModal } from '../../components/clients/ClientDetailModal';
-import { Badge } from '../../components/ui/Badge';
-import { Button } from '../../components/ui/Button';
+import { useNavigate } from 'react-router-dom';
+import { clientService } from '../../../services/clientService';
+import type { Client } from '../../../types/client';
+import { Badge } from '../../../components/ui/Badge';
+import { Button } from '../../../components/ui/Button';
+import { Loader } from '../../../components/ui/Loader';
 import { Phone, Mail, FileText, Eye, Search } from 'lucide-react';
 
 export const Clients = () => {
     const [clients, setClients] = useState<Client[]>([]);
     const [loading, setLoading] = useState(true);
-    const [selectedClient, setSelectedClient] = useState<Client | null>(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
+    const navigate = useNavigate();
 
     useEffect(() => {
         loadClients();
@@ -28,14 +28,12 @@ export const Clients = () => {
         }
     };
 
-    const handleViewClient = async (id: string) => {
-        try {
-            const client = await clientService.getById(id);
-            setSelectedClient(client);
-            setIsModalOpen(true);
-        } catch (error) {
-            console.error('Error loading client details:', error);
-        }
+    const handleViewClient = (id: string) => {
+        navigate(`/app/clients/${id}`);
+    };
+
+    const handleNewClient = () => {
+        navigate('/app/clients/new');
     };
 
     const filteredClients = clients.filter(client =>
@@ -43,7 +41,7 @@ export const Clients = () => {
     );
 
     if (loading) {
-        return <div className="p-6">Cargando clientes...</div>;
+        return <Loader message="Cargando clientes..." />;
     }
 
     return (
@@ -53,7 +51,7 @@ export const Clients = () => {
                     <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Gestión de Clientes</h1>
                     <p className="text-gray-500 dark:text-gray-400">Administra la información de tus clientes petroleros</p>
                 </div>
-                <Button onClick={() => { setSelectedClient(null); setIsModalOpen(true); }}>+ Nuevo Cliente</Button>
+                <Button onClick={handleNewClient}>+ Nuevo Cliente</Button>
             </div>
 
             <div className="flex bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm">
@@ -93,10 +91,11 @@ export const Clients = () => {
                                 <tr key={client.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
                                     <td className="p-4 font-medium text-gray-900 dark:text-white">{client.razonSocial}</td>
                                     <td className="p-4 text-gray-500 dark:text-gray-400">{client.cuit}</td>
-                                    <td className="p-4 text-gray-900 dark:text-gray-200">{client.contactName}</td>
+                                    <td className="p-4 text-gray-900 dark:text-gray-200">{client.contactName || '-'}</td>
                                     <td className="p-4 flex gap-2 text-gray-400">
                                         {client.phone && <Phone size={16} />}
                                         {client.email && <Mail size={16} />}
+                                        {!client.phone && !client.email && '-'}
                                     </td>
                                     <td className="p-4">
                                         <span className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-2 py-1 rounded-full text-xs font-medium">
@@ -120,13 +119,6 @@ export const Clients = () => {
                     </table>
                 </div>
             </div>
-
-            <ClientDetailModal
-                client={selectedClient}
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                onClientUpdated={loadClients}
-            />
         </div>
     );
 };

@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { StaffList } from '../../components/staff/StaffList';
-import { StaffForm } from '../../components/staff/StaffForm';
-import type { Personal, PersonalFilters } from '../../types/personal';
-import api from '../../services/api';
+import { StaffList } from '../../../components/personal/PersonalList';
+import { StaffForm } from '../../../components/personal/PersonalForm';
+import type { Personal, PersonalFilters } from '../../../types/personal';
+import api from '../../../services/api';
 import { Plus, Search, Filter, X, Users, CheckCircle, Clock, UserX } from 'lucide-react';
 
 export const Staff = () => {

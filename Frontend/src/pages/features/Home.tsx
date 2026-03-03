@@ -13,6 +13,8 @@ import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 
+// Aca tenemos todos los datos del sistema mockeados, hasta que tengamos los necesarios para realizar los graficos necesarios.
+
 export const Home: React.FC = () => {
     return (
         <div className="space-y-6 max-w-7xl mx-auto">

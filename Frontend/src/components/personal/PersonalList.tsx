@@ -2,6 +2,7 @@ import React from 'react';
 import type { Personal } from '../../types/personal';
 import { Eye, Pencil, Phone, Mail } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { Loader } from '../ui/Loader';
 
 interface StaffListProps {
     staff: Personal[];
@@ -10,14 +11,13 @@ interface StaffListProps {
     onView: (personal: Personal) => void;
 }
 
-export const StaffList: React.FC<StaffListProps> = ({ staff, loading, onEdit, onView }) => {
+export const StaffList: React.FC<StaffListProps> = ({ staff, loading, onEdit }) => {
     const navigate = useNavigate();
 
     if (loading) {
         return (
-            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-8 text-center transition-colors">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-900 dark:border-slate-400 mx-auto"></div>
-                <p className="mt-2 text-gray-500 dark:text-gray-400">Cargando personal...</p>
+            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-8 transition-colors">
+                <Loader message="Cargando personal..." />
             </div>
         );
     }

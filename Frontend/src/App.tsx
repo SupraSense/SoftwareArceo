@@ -1,15 +1,16 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { Landing } from './pages/public/Landing';
+import { Landing } from './pages/publicPage/Landing';
 import { Login } from './pages/auth/Login';
 import { ProtectedRoute } from './auth/ProtectedRoute';
-import { Home } from './pages/dashboard/Home';
+import { Home } from './pages/features/Home';
 import { TipoTareaPage } from './pages/configuration/TipoTareaPage';
-import { Clients } from './pages/dashboard/Clients';
-import { Profile } from './pages/dashboard/Profile';
+import { Clients } from './pages/features/clients/ClientsPage';
+import { ClientDetailPage } from './pages/features/clients/ClientsDetailPage';
+import { Profile } from './pages/features/perfil/Profile';
 import { DashboardLayout } from './components/layout/DashboardLayout';
-import { InProgress } from './pages/misc/InProgress';
-import { Staff } from './pages/dashboard/Staff';
-import { StaffDetail } from './pages/dashboard/StaffDetail';
+import { InProgress } from './pages/inProgress/InProgress';
+import { Staff } from './pages/features/personal/PersonalPage';
+import { StaffDetail } from './pages/features/personal/PersonalDetailPage';
 
 
 
@@ -22,12 +23,12 @@ function App() {
         <Route path="/login" element={<Login />} />
 
         {/* Rutas Protegidas */}
-        {/* Rutas Protegidas */}
         <Route element={<ProtectedRoute />}>
           <Route element={<DashboardLayout />}>
             <Route path="/app" element={<Home />} />
             <Route path="/app/configuration/type-task" element={<TipoTareaPage />} />
             <Route path="/app/clients" element={<Clients />} />
+            <Route path="/app/clients/:id" element={<ClientDetailPage />} />
             <Route path="/app/profile" element={<Profile />} />
 
             {/* Rutas en Implementación */}

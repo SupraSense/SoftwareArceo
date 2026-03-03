@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import type { Personal } from '../../types/personal';
-import api from '../../services/api';
+import type { Personal } from '../../../types/personal';
+import api from '../../../services/api';
 import { ArrowLeft, Phone, Mail, Edit, Calendar, FileText, CheckCircle, Clock } from 'lucide-react';
-import { StaffForm } from '../../components/staff/StaffForm';
+import { StaffForm } from '../../../components/personal/PersonalForm';
 
 export const StaffDetail = () => {
     const { id } = useParams<{ id: string }>();

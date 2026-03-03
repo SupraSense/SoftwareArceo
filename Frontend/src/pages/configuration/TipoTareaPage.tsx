@@ -4,6 +4,7 @@ import { tipoTareaService } from '../../services/tipoTareaService';
 import type { TipoTarea } from '../../types/tipoTarea';
 import { Button } from '../../components/ui/Button';
 import { TipoTareaForm } from '../../components/tipoTarea/TipoTareaForm';
+import { Loader } from '../../components/ui/Loader';
 
 export const TipoTareaPage: React.FC = () => {
     const [tipos, setTipos] = useState<TipoTarea[]>([]);
@@ -117,8 +118,8 @@ export const TipoTareaPage: React.FC = () => {
                         <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                             {isLoading ? (
                                 <tr>
-                                    <td colSpan={2} className="py-8 text-center text-gray-500">
-                                        Cargando...
+                                    <td colSpan={2} className="py-8 text-center">
+                                        <Loader message="Cargando..." />
                                     </td>
                                 </tr>
                             ) : tipos.length === 0 ? (

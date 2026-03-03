@@ -24,7 +24,8 @@
     "express": "^4.18.2",
     "express-jwt": "^8.5.1",
     "jwks-rsa": "^3.2.2",
-    "qs": "^6.14.1"
+    "qs": "^6.14.1",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",

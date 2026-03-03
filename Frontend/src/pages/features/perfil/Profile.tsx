@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { authService } from '../../auth/authService';
+import { authService } from '../../../auth/authService';
 import { User, Save, AlertCircle } from 'lucide-react';
+import { Loader } from '../../../components/ui/Loader';
 
 interface ProfileForm {
     id: string;
@@ -60,7 +61,7 @@ export const Profile: React.FC = () => {
         }
     };
 
-    if (loading) return <div className="p-6">Cargando perfil...</div>;
+    if (loading) return <Loader message="Cargando perfil..." />;
 
     return (
         <div className="max-w-4xl mx-auto p-6">
