@@ -12,6 +12,7 @@ import { DashboardLayout } from './components/layout/DashboardLayout';
 import { InProgress } from './pages/inProgress/InProgress';
 import { Staff } from './pages/features/personal/PersonalPage';
 import { StaffDetail } from './pages/features/personal/PersonalDetailPage';
+import { UsersPage } from './pages/configuration/users/UsersPage';
 
 
 
@@ -29,17 +30,17 @@ function App() {
           <Route element={<DashboardLayout />}>
             <Route path="/app" element={<Home />} />
             <Route path="/app/configuration/type-task" element={<TipoTareaPage />} />
+            <Route path="/app/configuration/pozos" element={<InProgress />} />
+            <Route path="/app/configuration/segmentos" element={<InProgress />} />
+            <Route path="/app/configuration/usuarios" element={<UsersPage />} />
             <Route path="/app/clients" element={<Clients />} />
             <Route path="/app/clients/:id" element={<ClientDetailPage />} />
             <Route path="/app/profile" element={<Profile />} />
 
             {/* Rutas en Implementación */}
             <Route path="/app/orders" element={<InProgress />} />
-            <Route path="/app/kanban" element={<InProgress />} />
             <Route path="/app/remitos" element={<InProgress />} />
             <Route path="/app/agenda" element={<InProgress />} />
-            <Route path="/app/messages" element={<InProgress />} />
-            <Route path="/app/reports" element={<InProgress />} />
             <Route path="/app/resources" element={<InProgress />} />
             <Route path="/app/resources" element={<InProgress />} />
             <Route path="/app/staff" element={<Staff />} />

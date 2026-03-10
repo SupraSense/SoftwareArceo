@@ -71,22 +71,25 @@ export const PersonalForm: React.FC<StaffFormProps> = ({ onCancel, onSubmit, ini
         <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Input
-                    label="Nombre *"
+                    label="Nombre"
                     icon={<User size={18} />}
+                    placeholder="Ingrese el nombre"
                     error={errors.nombre?.message}
                     {...register('nombre')}
                 />
 
                 <Input
-                    label="Apellido *"
+                    label="Apellido"
                     icon={<User size={18} />}
+                    placeholder="Ingrese el apellido"
                     error={errors.apellido?.message}
                     {...register('apellido')}
                 />
 
                 <Input
-                    label="Email *"
+                    label="Email"
                     icon={<Mail size={18} />}
+                    placeholder="contacto@empresa.com"
                     type="email"
                     error={errors.email?.message}
                     {...register('email')}
@@ -95,6 +98,7 @@ export const PersonalForm: React.FC<StaffFormProps> = ({ onCancel, onSubmit, ini
                 <Input
                     label="Teléfono"
                     icon={<Phone size={18} />}
+                    placeholder="Ej. 112345679"
                     type="tel"
                     error={errors.telefono?.message}
                     {...register('telefono')}
@@ -102,7 +106,7 @@ export const PersonalForm: React.FC<StaffFormProps> = ({ onCancel, onSubmit, ini
 
                 <div className="w-full">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Área *
+                        Área
                     </label>
                     <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">
@@ -121,7 +125,7 @@ export const PersonalForm: React.FC<StaffFormProps> = ({ onCancel, onSubmit, ini
                 </div>
 
                 <Input
-                    label="Fecha de Ingreso *"
+                    label="Fecha de Ingreso"
                     icon={<Calendar size={18} />}
                     type="date"
                     className="[color-scheme:light] dark:[color-scheme:dark]"

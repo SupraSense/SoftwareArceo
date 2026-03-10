@@ -3,11 +3,8 @@ import { NavLink } from 'react-router-dom';
 import {
     LayoutDashboard,
     ClipboardList,
-    Trello,
     Inbox,
     Calendar,
-    MessageSquare,
-    BarChart2,
     Users,
     Truck,
     UserCircle,
@@ -16,7 +13,10 @@ import {
     Settings,
     Building2,
     X,
-    Menu
+    Menu,
+    Locate,
+    TableColumnsSplit,
+    User
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -30,11 +30,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ className = '', onClose, isCol
     const navItems = [
         { name: 'Inicio', icon: LayoutDashboard, path: '/app' },
         { name: 'Órdenes de Trabajo', icon: ClipboardList, path: '/app/orders' },
-        { name: 'Tareas Kanban', icon: Trello, path: '/app/kanban' },
         { name: 'Bandeja Remitos', icon: Inbox, path: '/app/remitos' },
         { name: 'Agenda', icon: Calendar, path: '/app/agenda' },
-        { name: 'Mensajes Programados', icon: MessageSquare, path: '/app/messages' },
-        { name: 'KPIs y Reportes', icon: BarChart2, path: '/app/reports' },
         { name: 'Clientes', icon: Building2, path: '/app/clients' },
         { name: 'Recursos', icon: Truck, path: '/app/resources' },
         { name: 'Personal', icon: Users, path: '/app/staff' },
@@ -45,6 +42,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ className = '', onClose, isCol
 
     const configItems = [
         { name: 'Tipos de Tareas', icon: Settings, path: '/app/configuration/type-task' },
+        { name: 'Pozos', icon: Locate, path: '/app/configuration/pozos' },
+        { name: 'Segmentos', icon: TableColumnsSplit, path: '/app/configuration/segmentos' },
+        { name: 'Usuarios', icon: User, path: '/app/configuration/usuarios' }
     ];
 
     return (
