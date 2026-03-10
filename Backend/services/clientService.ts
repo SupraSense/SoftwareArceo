@@ -1,135 +1,153 @@
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '../lib/prisma';
+import { NotFoundError, ConflictError } from '../lib/errors';
+import type { CreateClientInput, UpdateClientInput } from '../validators/clientValidation';
 
 export const getAllClients = async () => {
-    return await prisma.client.findMany({
+    const clients = await prisma.client.findMany({
         where: {
-            status: {
-                name: {
-                    not: 'Inactivo'
-                }
-            }
+            status: { name: { not: 'Inactivo' } },
         },
         include: {
             status: true,
             contacts: true,
             _count: {
-                select: { contracts: { where: { isActive: true } } }
-            }
+                select: { contracts: { where: { isActive: true } } },
+            },
         },
-        orderBy: { razonSocial: 'asc' }
+        orderBy: { razonSocial: 'asc' },
     });
+
+    return clients.map((c) => ({
+        id: c.id,
+        razonSocial: c.razonSocial,
+        cuit: c.cuit,
+        contactName: c.contacts[0]?.name || 'Sin Contacto',
+        phone: c.contacts[0]?.phone || '',
+        email: c.contacts[0]?.email || '',
+        activeContracts: c._count.contracts,
+        status: c.status.name,
+    }));
 };
 
 export const getClientById = async (id: string) => {
-    return await prisma.client.findUnique({
+    const client = await prisma.client.findUnique({
         where: { id },
         include: {
             status: true,
             contacts: true,
             _count: {
-                select: { contracts: { where: { isActive: true } } }
-            }
-        }
-    });
-};
-
-export const createClient = async (data: any) => {
-    return await prisma.$transaction(async (tx) => {
-        // Ensure "Activo" status exists
-        let activeStatus = await tx.clientStatus.findUnique({ where: { name: 'Activo' } });
-        if (!activeStatus) {
-            activeStatus = await tx.clientStatus.create({ data: { name: 'Activo' } });
-        }
-
-        const newClient = await tx.client.create({
-            data: {
-                razonSocial: data.razonSocial,
-                cuit: data.cuit,
-                direccion: data.address,
-                statusId: activeStatus.id,
-                contacts: {
-                    create: {
-                        name: data.contactName,
-                        phone: data.phone,
-                        email: data.email
-                    }
-                }
+                select: { contracts: { where: { isActive: true } } },
             },
-            include: {
-                contacts: true,
-                status: true
-            }
-        });
-
-        return newClient;
-    });
-};
-
-export const updateClient = async (id: string, data: any) => {
-    // Check if client exists and has contracts to enforce CUIT immutability constraint if attempted
-    const client = await prisma.client.findUnique({
-        where: { id },
-        include: { contracts: true }
+        },
     });
 
-    if (!client) throw new Error("Client not found");
-
-    if (data.cuit && data.cuit !== client.cuit && client.contracts.length > 0) {
-        throw new Error("Cannot update CUIT for client with existing contracts");
+    if (!client) {
+        throw new NotFoundError('Cliente no encontrado');
     }
 
-    // Prepare update data - exclude CUIT if strictly immutable or just validate above
-    // Prompt says: "Allow updating the Address, Phone, Email, and Contact Name."
-    // implying CUIT/Razon Social might not be editable or we should be careful.
-    // However, for strict compliance with "Business Rule", I handled the check.
-    // We will update the allowed fields.
+    return {
+        id: client.id,
+        razonSocial: client.razonSocial,
+        cuit: client.cuit,
+        address: client.direccion,
+        status: client.status.name,
+        contactName: client.contacts[0]?.name || 'Sin Contacto',
+        phone: client.contacts[0]?.phone || '',
+        email: client.contacts[0]?.email || '',
+        activeContracts: client._count.contracts,
+    };
+};
 
-    return await prisma.client.update({
+export const createClient = async (data: CreateClientInput) => {
+    try {
+        return await prisma.$transaction(async (tx) => {
+            let activeStatus = await tx.clientStatus.findUnique({ where: { name: 'Activo' } });
+            if (!activeStatus) {
+                activeStatus = await tx.clientStatus.create({ data: { name: 'Activo' } });
+            }
+
+            return tx.client.create({
+                data: {
+                    razonSocial: data.razonSocial,
+                    cuit: data.cuit,
+                    direccion: data.address || '',
+                    statusId: activeStatus.id,
+                    contacts: {
+                        create: {
+                            name: data.contactName || '',
+                            phone: data.phone,
+                            email: data.email,
+                        },
+                    },
+                },
+                include: {
+                    contacts: true,
+                    status: true,
+                },
+            });
+        });
+    } catch (error: any) {
+        if (error.code === 'P2002') {
+            throw new ConflictError('El CUIT ingresado ya existe');
+        }
+        throw error;
+    }
+};
+
+export const updateClient = async (id: string, data: UpdateClientInput) => {
+    const client = await prisma.client.findUnique({
+        where: { id },
+        include: { contracts: true },
+    });
+
+    if (!client) {
+        throw new NotFoundError('Cliente no encontrado');
+    }
+
+    if (data.cuit && data.cuit !== client.cuit && client.contracts.length > 0) {
+        throw new ConflictError('No se puede modificar el CUIT de un cliente con contratos existentes');
+    }
+
+    return prisma.client.update({
         where: { id },
         data: {
-            razonSocial: data.razonSocial, // Allow update if provided
-            direccion: data.address,
+            ...(data.razonSocial !== undefined && { razonSocial: data.razonSocial }),
+            ...(data.address !== undefined && { direccion: data.address }),
             contacts: {
                 updateMany: {
-                    where: { clientId: id }, // Update all contacts or just primary?
-                    // Assuming single contact for now based on "Create" logic
+                    where: { clientId: id },
                     data: {
-                        name: data.contactName,
-                        phone: data.phone,
-                        email: data.email
-                    }
-                }
-            }
+                        ...(data.contactName !== undefined && { name: data.contactName }),
+                        ...(data.phone !== undefined && { phone: data.phone }),
+                        ...(data.email !== undefined && { email: data.email }),
+                    },
+                },
+            },
         },
         include: {
             contacts: true,
             status: true,
             _count: {
-                select: { contracts: { where: { isActive: true } } }
-            }
-        }
+                select: { contracts: { where: { isActive: true } } },
+            },
+        },
     });
 };
 
 export const deleteClient = async (id: string) => {
-    const client = await prisma.client.findUnique({
-        where: { id },
-        include: { contracts: true }
-    });
+    const client = await prisma.client.findUnique({ where: { id } });
 
     if (!client) {
-        throw new Error("Client not found");
+        throw new NotFoundError('Cliente no encontrado');
     }
 
-    // Logical deletion (Inactivo) for ALL clients as per new requirement
     let inactiveStatus = await prisma.clientStatus.findUnique({ where: { name: 'Inactivo' } });
     if (!inactiveStatus) {
         inactiveStatus = await prisma.clientStatus.create({ data: { name: 'Inactivo' } });
     }
-    return await prisma.client.update({
+
+    return prisma.client.update({
         where: { id },
-        data: { statusId: inactiveStatus.id }
+        data: { statusId: inactiveStatus.id },
     });
 };
