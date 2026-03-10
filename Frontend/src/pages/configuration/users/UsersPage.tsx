@@ -1,30 +1,23 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { UserPlus, Shield } from 'lucide-react';
 import { Button } from '../../../components/ui/Button';
 import { Loader } from '../../../components/ui/Loader';
 import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
-import { UserForm } from '../../../components/users/UserForm';
-import { UserEditForm } from '../../../components/users/UserEditForm';
 import { UserTable } from '../../../components/users/UserTable';
 import { useUsers } from '../../../hooks/useUsers';
 import type { User } from '../../../types/user';
 
 export const UsersPage: React.FC = () => {
+    const navigate = useNavigate();
     const {
         users,
         loading,
         loadUsers,
-        createUser,
-        updateUser,
         deactivateUser,
         activateUser,
         resendInvitation,
     } = useUsers();
-
-    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [editingUser, setEditingUser] = useState<User | null>(null);
-    const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Deactivation confirmation dialog
     const [isDeactivateDialogOpen, setIsDeactivateDialogOpen] = useState(false);
@@ -40,29 +33,14 @@ export const UsersPage: React.FC = () => {
         loadUsers();
     }, [loadUsers]);
 
-    // === Create flow ===
-    const handleCreateUser = async (data: Parameters<typeof createUser>[0]) => {
-        setIsSubmitting(true);
-        try {
-            return await createUser(data);
-        } finally {
-            setIsSubmitting(false);
-        }
+    // === Navigate to create page ===
+    const handleCreateClick = () => {
+        navigate('/app/configuration/usuarios/new');
     };
 
-    // === Edit flow ===
+    // === Navigate to detail/edit page ===
     const handleEditClick = (user: User) => {
-        setEditingUser(user);
-        setIsEditModalOpen(true);
-    };
-
-    const handleEditSubmit = async (id: string, data: Parameters<typeof updateUser>[1]) => {
-        setIsSubmitting(true);
-        try {
-            return await updateUser(id, data);
-        } finally {
-            setIsSubmitting(false);
-        }
+        navigate(`/app/configuration/usuarios/${user.id}`);
     };
 
     // === Deactivation flow ===
@@ -124,7 +102,7 @@ export const UsersPage: React.FC = () => {
                     </p>
                 </div>
                 <Button
-                    onClick={() => setIsCreateModalOpen(true)}
+                    onClick={handleCreateClick}
                     leftIcon={<UserPlus size={18} />}
                     className="bg-[#1e293b] hover:bg-[#334155] text-white"
                 >
@@ -141,55 +119,39 @@ export const UsersPage: React.FC = () => {
                 onResendInvitation={handleResendInvitation}
             />
 
-            {/* Create user modal */}
-            <UserForm
-                isOpen={isCreateModalOpen}
-                onClose={() => setIsCreateModalOpen(false)}
-                onSubmit={handleCreateUser}
-                isLoading={isSubmitting}
-            />
+            {/* Deactivation confirmation — kept as dialog (simple, no form) */}
+            {isDeactivateDialogOpen && deactivatingUser && (
+                <ConfirmDialog
+                    isOpen={true}
+                    title="Dar de Baja al Usuario"
+                    description={`¿Estás seguro que deseas dar de baja a ${deactivatingUser.firstName} ${deactivatingUser.lastName}? El usuario no podrá acceder al sistema hasta ser reactivado.`}
+                    isHardDelete={false}
+                    onConfirm={handleConfirmDeactivate}
+                    onCancel={() => {
+                        setIsDeactivateDialogOpen(false);
+                        setDeactivatingUser(null);
+                    }}
+                    confirmText="Dar de Baja"
+                    isLoading={isDeactivating}
+                />
+            )}
 
-            {/* Edit user modal */}
-            <UserEditForm
-                isOpen={isEditModalOpen}
-                onClose={() => {
-                    setIsEditModalOpen(false);
-                    setEditingUser(null);
-                }}
-                onSubmit={handleEditSubmit}
-                user={editingUser}
-                isLoading={isSubmitting}
-            />
-
-            {/* Deactivation confirmation */}
-            <ConfirmDialog
-                isOpen={isDeactivateDialogOpen}
-                title="Dar de Baja al Usuario"
-                description={`¿Estás seguro que deseas dar de baja a ${deactivatingUser?.firstName} ${deactivatingUser?.lastName}? El usuario no podrá acceder al sistema hasta ser reactivado.`}
-                isHardDelete={false}
-                onConfirm={handleConfirmDeactivate}
-                onCancel={() => {
-                    setIsDeactivateDialogOpen(false);
-                    setDeactivatingUser(null);
-                }}
-                confirmText="Dar de Baja"
-                isLoading={isDeactivating}
-            />
-
-            {/* Activation confirmation */}
-            <ConfirmDialog
-                isOpen={isActivateDialogOpen}
-                title="Reactivar Usuario"
-                description={`¿Estás seguro que deseas reactivar a ${activatingUser?.firstName} ${activatingUser?.lastName}? El usuario podrá volver a acceder al sistema.`}
-                isHardDelete={false}
-                onConfirm={handleConfirmActivate}
-                onCancel={() => {
-                    setIsActivateDialogOpen(false);
-                    setActivatingUser(null);
-                }}
-                confirmText="Reactivar"
-                isLoading={isActivating}
-            />
+            {/* Activation confirmation — kept as dialog (simple, no form) */}
+            {isActivateDialogOpen && activatingUser && (
+                <ConfirmDialog
+                    isOpen={true}
+                    title="Reactivar Usuario"
+                    description={`¿Estás seguro que deseas reactivar a ${activatingUser.firstName} ${activatingUser.lastName}? El usuario podrá volver a acceder al sistema.`}
+                    isHardDelete={false}
+                    onConfirm={handleConfirmActivate}
+                    onCancel={() => {
+                        setIsActivateDialogOpen(false);
+                        setActivatingUser(null);
+                    }}
+                    confirmText="Reactivar"
+                    isLoading={isActivating}
+                />
+            )}
         </div>
     );
 };

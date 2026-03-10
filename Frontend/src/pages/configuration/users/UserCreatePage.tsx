@@ -1,33 +1,24 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
+import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { X, User, Mail, CreditCard, Shield, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
-import { Button } from '../ui/Button';
-import { Input } from '../ui/Input';
-import { createUserSchema, type CreateUserFormData } from '../../schemasZod/userSchema';
-import { USER_ROLES } from '../../types/user';
-import { userService } from '../../services/userService';
-
-interface UserFormProps {
-    isOpen: boolean;
-    onClose: () => void;
-    onSubmit: (data: CreateUserFormData) => Promise<boolean>;
-    isLoading?: boolean;
-}
+import { ArrowLeft, User, Mail, CreditCard, Shield, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { Button } from '../../../components/ui/Button';
+import { Input } from '../../../components/ui/Input';
+import { createUserSchema, type CreateUserFormData } from '../../../schemasZod/userSchema';
+import { USER_ROLES } from '../../../types/user';
+import { userService } from '../../../services/userService';
+import { useUsers } from '../../../hooks/useUsers';
 
 type ValidationState = 'idle' | 'checking' | 'available' | 'unavailable';
 
-export const UserForm: React.FC<UserFormProps> = ({
-    isOpen,
-    onClose,
-    onSubmit,
-    isLoading = false,
-}) => {
+export const UserCreatePage: React.FC = () => {
+    const navigate = useNavigate();
+    const { createUser } = useUsers();
+
     const {
         register,
         handleSubmit,
-        reset,
         watch,
         formState: { errors },
     } = useForm<CreateUserFormData>({
@@ -42,6 +33,7 @@ export const UserForm: React.FC<UserFormProps> = ({
         },
     });
 
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [emailValidation, setEmailValidation] = useState<ValidationState>('idle');
     const [emailMessage, setEmailMessage] = useState('');
     const [dniValidation, setDniValidation] = useState<ValidationState>('idle');
@@ -63,7 +55,6 @@ export const UserForm: React.FC<UserFormProps> = ({
             return;
         }
 
-        // Basic email format check before hitting API
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(watchedEmail)) {
             setEmailValidation('idle');
@@ -102,7 +93,6 @@ export const UserForm: React.FC<UserFormProps> = ({
             return;
         }
 
-        // Verify DNI is numeric and has min length
         if (!/^\d{7,8}$/.test(watchedDni)) {
             setDniValidation('idle');
             return;
@@ -130,30 +120,19 @@ export const UserForm: React.FC<UserFormProps> = ({
         };
     }, [watchedDni, errors.dni]);
 
-    useEffect(() => {
-        if (isOpen) {
-            reset({
-                firstName: '',
-                lastName: '',
-                dni: '',
-                email: '',
-                role: undefined,
-            });
-            setEmailValidation('idle');
-            setEmailMessage('');
-            setDniValidation('idle');
-            setDniMessage('');
-        }
-    }, [isOpen, reset]);
-
     const handleFormSubmit = async (data: CreateUserFormData) => {
-        // Block if unique validation failed
-        if (emailValidation === 'unavailable' || dniValidation === 'unavailable') {
-            return;
-        }
-        const success = await onSubmit(data);
-        if (success) {
-            onClose();
+        if (emailValidation === 'unavailable' || dniValidation === 'unavailable') return;
+
+        setIsSubmitting(true);
+        try {
+            const result = await createUser(data);
+            if (result) {
+                navigate('/app/configuration/usuarios');
+            }
+        } catch {
+            // useUsers hook handles error notifications
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -182,38 +161,40 @@ export const UserForm: React.FC<UserFormProps> = ({
         );
     };
 
-    if (!isOpen) return null;
-
     const isFormBlocked = emailValidation === 'unavailable' || dniValidation === 'unavailable';
 
-    return createPortal(
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all animate-in zoom-in-95 duration-200 border border-gray-200 dark:border-gray-700">
-                {/* Header */}
-                <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-primary-50 to-blue-50 dark:from-gray-800 dark:to-gray-800">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 bg-primary-100 dark:bg-primary-900/40 rounded-lg">
-                            <User className="w-5 h-5 text-primary-600 dark:text-primary-400" />
-                        </div>
-                        <div>
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                                Solicitud de Alta de Usuario
-                            </h3>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
-                                Se enviará un email con credenciales temporales
+    return (
+        <div className="max-w-4xl mx-auto space-y-6">
+            {/* Header */}
+            <div className="flex items-center gap-4">
+                <button
+                    onClick={() => navigate('/app/configuration/usuarios')}
+                    className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 transition-colors"
+                >
+                    <ArrowLeft size={24} />
+                </button>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                    Solicitud de Alta de Usuario
+                </h1>
+            </div>
+
+            {/* Form Card */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 transition-colors">
+                {/* Info box */}
+                <div className="p-3 mb-6 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-lg">
+                    <div className="flex items-start gap-2">
+                        <Mail className="w-4 h-4 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
+                        <div className="text-xs text-blue-800 dark:text-blue-300">
+                            <p className="font-semibold mb-0.5">Contraseña Temporal Automática</p>
+                            <p className="text-blue-600 dark:text-blue-400">
+                                Al confirmar, se generará automáticamente una contraseña temporal segura y se enviará un email
+                                al usuario con un link único para su primer inicio de sesión.
                             </p>
                         </div>
                     </div>
-                    <button
-                        onClick={onClose}
-                        className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                    >
-                        <X size={20} />
-                    </button>
                 </div>
 
-                {/* Form */}
-                <form onSubmit={handleSubmit(handleFormSubmit)} className="p-6 space-y-5">
+                <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-5">
                     {/* Name fields row */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
@@ -297,34 +278,20 @@ export const UserForm: React.FC<UserFormProps> = ({
                         )}
                     </div>
 
-                    {/* Info box about temp password */}
-                    <div className="p-3 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-lg">
-                        <div className="flex items-start gap-2">
-                            <Mail className="w-4 h-4 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
-                            <div className="text-xs text-blue-800 dark:text-blue-300">
-                                <p className="font-semibold mb-0.5">Contraseña Temporal Automática</p>
-                                <p className="text-blue-600 dark:text-blue-400">
-                                    Al confirmar, se generará automáticamente una contraseña temporal segura y se enviará un email
-                                    al usuario con un link único para su primer inicio de sesión.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
                     {/* Action buttons */}
-                    <div className="flex justify-end gap-3 pt-2 border-t border-gray-100 dark:border-gray-700">
+                    <div className="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-700">
                         <Button
                             type="button"
                             variant="ghost"
-                            onClick={onClose}
-                            disabled={isLoading}
+                            onClick={() => navigate('/app/configuration/usuarios')}
+                            disabled={isSubmitting}
                         >
                             Cancelar
                         </Button>
                         <Button
                             type="submit"
                             variant="primary"
-                            isLoading={isLoading}
+                            isLoading={isSubmitting}
                             disabled={isFormBlocked}
                             leftIcon={<Mail size={16} />}
                         >
@@ -333,7 +300,6 @@ export const UserForm: React.FC<UserFormProps> = ({
                     </div>
                 </form>
             </div>
-        </div>,
-        document.body
+        </div>
     );
 };

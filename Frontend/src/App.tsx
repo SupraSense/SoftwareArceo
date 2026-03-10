@@ -13,6 +13,8 @@ import { InProgress } from './pages/inProgress/InProgress';
 import { Staff } from './pages/features/personal/PersonalPage';
 import { StaffDetail } from './pages/features/personal/PersonalDetailPage';
 import { UsersPage } from './pages/configuration/users/UsersPage';
+import { UserCreatePage } from './pages/configuration/users/UserCreatePage';
+import { UserDetailPage } from './pages/configuration/users/UserDetailPage';
 
 
 
@@ -33,6 +35,8 @@ function App() {
             <Route path="/app/configuration/pozos" element={<InProgress />} />
             <Route path="/app/configuration/segmentos" element={<InProgress />} />
             <Route path="/app/configuration/usuarios" element={<UsersPage />} />
+            <Route path="/app/configuration/usuarios/new" element={<UserCreatePage />} />
+            <Route path="/app/configuration/usuarios/:id" element={<UserDetailPage />} />
             <Route path="/app/clients" element={<Clients />} />
             <Route path="/app/clients/:id" element={<ClientDetailPage />} />
             <Route path="/app/profile" element={<Profile />} />

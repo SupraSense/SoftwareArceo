@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+import React from 'react';
+import { createPortal } from 'react-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { X, User, Mail, CreditCard, Shield, Settings } from 'lucide-react';
@@ -12,7 +13,7 @@ interface UserEditFormProps {
     isOpen: boolean;
     onClose: () => void;
     onSubmit: (id: string, data: UpdateUserFormData) => Promise<boolean>;
-    user: UserType | null;
+    user: UserType;
     isLoading?: boolean;
 }
 
@@ -26,38 +27,31 @@ export const UserEditForm: React.FC<UserEditFormProps> = ({
     const {
         register,
         handleSubmit,
-        reset,
         formState: { errors, isDirty },
     } = useForm<UpdateUserFormData>({
         resolver: zodResolver(updateUserSchema),
-        mode: 'onChange',
+        mode: 'onBlur',
+        defaultValues: {
+            firstName: user.firstName || '',
+            lastName: user.lastName || '',
+            dni: user.dni || '',
+            email: user.email || '',
+            role: user.role || undefined,
+            status: user.status || undefined,
+        },
     });
 
-    useEffect(() => {
-        if (isOpen && user) {
-            reset({
-                firstName: user.firstName || '',
-                lastName: user.lastName || '',
-                dni: user.dni || '',
-                email: user.email || '',
-                role: user.role || undefined,
-                status: user.status || undefined,
-            });
-        }
-    }, [isOpen, user, reset]);
-
     const handleFormSubmit = async (data: UpdateUserFormData) => {
-        if (!user) return;
         const success = await onSubmit(user.id, data);
         if (success) {
             onClose();
         }
     };
 
-    if (!isOpen || !user) return null;
+    if (!isOpen) return null;
 
-    return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+    return createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all animate-in zoom-in-95 duration-200 border border-gray-200 dark:border-gray-700">
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-gray-800 dark:to-gray-800">
@@ -196,6 +190,7 @@ export const UserEditForm: React.FC<UserEditFormProps> = ({
                     </div>
                 </form>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
