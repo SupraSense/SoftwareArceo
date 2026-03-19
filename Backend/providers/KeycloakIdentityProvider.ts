@@ -13,18 +13,37 @@ export class KeycloakIdentityProvider implements IIdentityProvider {
     private readonly realm: string;
     private readonly clientId: string;
     private readonly clientSecret: string;
+    private readonly adminUser: string | undefined;
+    private readonly adminPass: string | undefined;
 
     constructor() {
         this.baseUrl = process.env.KEYCLOAK_URL || 'http://localhost:8080';
         this.realm = process.env.KEYCLOAK_REALM || 'SoftwareArceo';
         this.clientId = process.env.KEYCLOAK_CLIENT_ID || 'sgo-frontend';
         this.clientSecret = process.env.KEYCLOAK_CLIENT_SECRET || 'my-secret-key-123';
+        this.adminUser = process.env.KEYCLOAK_ADMIN_USER;
+        this.adminPass = process.env.KEYCLOAK_ADMIN_PASSWORD;
     }
 
     /**
      * Obtains an admin access token via client credentials grant.
      */
     private async getAdminToken(): Promise<string> {
+        // If master admin credentials exist, use them against the master realm with admin-cli (bypass 403 on admin users)
+        if (this.adminUser && this.adminPass) {
+            const tokenUrl = `${this.baseUrl}/realms/master/protocol/openid-connect/token`;
+            const response = await axios.post(tokenUrl, new URLSearchParams({
+                client_id: 'admin-cli',
+                grant_type: 'password',
+                username: this.adminUser,
+                password: this.adminPass,
+            }), {
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            });
+            return response.data.access_token;
+        }
+
+        // Fallback to currently configured client_credentials
         const tokenUrl = `${this.baseUrl}/realms/${this.realm}/protocol/openid-connect/token`;
 
         const response = await axios.post(tokenUrl, new URLSearchParams({
@@ -135,6 +154,40 @@ export class KeycloakIdentityProvider implements IIdentityProvider {
         await axios.put(
             `${this.adminApiUrl}/users/${idpUserId}`,
             { enabled: true },
+            {
+                headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+            }
+        );
+    }
+
+    async verifyUserPassword(email: string, password: string): Promise<boolean> {
+        const tokenUrl = `${this.baseUrl}/realms/${this.realm}/protocol/openid-connect/token`;
+
+        try {
+            await axios.post(tokenUrl, new URLSearchParams({
+                client_id: this.clientId,
+                client_secret: this.clientSecret,
+                grant_type: 'password',
+                username: email,
+                password: password,
+            }), {
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            });
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
+
+    async resetUserPassword(idpUserId: string, newPassword: string): Promise<void> {
+        const token = await this.getAdminToken();
+        await axios.put(
+            `${this.adminApiUrl}/users/${idpUserId}/reset-password`,
+            {
+                type: 'password',
+                value: newPassword,
+                temporary: false,
+            },
             {
                 headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
             }

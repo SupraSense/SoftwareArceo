@@ -11,5 +11,6 @@ router.post('/logout', authController.logout);
 router.post('/refresh', authController.refreshToken);
 router.get('/me', checkJwt, authController.me);
 router.put('/me', checkJwt, authController.updateProfile);
+router.put('/me/password', checkJwt, authController.changePassword);
 
 export default router;

@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import axios from 'axios';
 import qs from 'qs';
 import * as userService from '../services/userService';
+import { changePasswordSchema } from '../validators/authValidation';
+import { KeycloakIdentityProvider } from '../providers/KeycloakIdentityProvider';
 
 const KEYCLOAK_URL = process.env.KEYCLOAK_URL || 'http://localhost:8080';
 const REALM = process.env.KEYCLOAK_REALM || 'SoftwareArceo';
@@ -198,6 +200,35 @@ export const updateProfile = async (req: Request, res: Response) => {
     } catch (error) {
         console.error('Error updating profile:', error);
         return res.status(500).json({ message: 'Error updating profile' });
+    }
+};
+
+export const changePassword = async (req: Request, res: Response) => {
+    try {
+        const sub = req.auth?.sub;
+        if (!sub) return res.status(401).json({ message: 'Unauthorized' });
+
+        const user = await userService.getUserById(sub);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        const parseResult = changePasswordSchema.safeParse(req.body);
+        if (!parseResult.success) {
+            return res.status(400).json({ message: parseResult.error.issues[0]?.message || 'Datos inválidos' });
+        }
+
+        const identityProvider = new KeycloakIdentityProvider();
+        
+        const isPasswordValid = await identityProvider.verifyUserPassword(user.email, parseResult.data.currentPassword);
+        if (!isPasswordValid) {
+            return res.status(400).json({ message: 'Contraseña actual incorrecta' });
+        }
+
+        await identityProvider.resetUserPassword(sub, parseResult.data.newPassword);
+
+        return res.json({ success: true, message: 'Contraseña actualizada correctamente' });
+    } catch (error) {
+        console.error('Error changing password:', error);
+        return res.status(500).json({ message: 'Error al cambiar la contraseña' });
     }
 };
 

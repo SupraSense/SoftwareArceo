@@ -26,4 +26,10 @@ export interface IIdentityProvider {
 
     /** Enables user login in the IdP */
     enableUser(idpUserId: string): Promise<void>;
+
+    /** Verifies a user's password directly against the IdP */
+    verifyUserPassword(email: string, password: string): Promise<boolean>;
+
+    /** Resets the user's password in the IdP */
+    resetUserPassword(idpUserId: string, newPassword: string): Promise<void>;
 }

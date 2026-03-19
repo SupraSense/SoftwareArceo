@@ -5,6 +5,8 @@ import { User, Save } from 'lucide-react';
 import { Loader } from '../../../components/ui/Loader';
 import { useNotification } from '../../../hooks/useNotification';
 import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
+import { ChangePasswordForm } from './components/ChangePasswordForm';
+import type { ChangePasswordInput } from '../../../schemasZod/authSchema';
 
 interface ProfileForm {
     id: string;
@@ -21,6 +23,9 @@ export const Profile: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const { showSuccess, showServerError, showValidationError } = useNotification();
+
+    const [activeTab, setActiveTab] = useState<'personal' | 'security'>('personal');
+    const [savingPassword, setSavingPassword] = useState(false);
 
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const [pendingData, setPendingData] = useState<ProfileForm | null>(null);
@@ -80,6 +85,24 @@ export const Profile: React.FC = () => {
         setPendingData(null);
     };
 
+    const handleChangePassword = async (data: ChangePasswordInput) => {
+        setSavingPassword(true);
+        try {
+            await authService.changePassword(data);
+            showSuccess('Contraseña actualizada correctamente');
+        } catch (err: any) {
+            const errorMsg = err.response?.data?.message || 'Error al actualizar contraseña';
+            const status = err.response?.status;
+            if (status === 400 || status === 403 || status === 404) {
+                showValidationError(errorMsg);
+            } else {
+                showServerError(err, errorMsg);
+            }
+        } finally {
+            setSavingPassword(false);
+        }
+    };
+
     if (loading) return <Loader message="Cargando perfil..." />;
 
     return (
@@ -94,10 +117,38 @@ export const Profile: React.FC = () => {
                 </div>
             </div>
 
+            {/* Tabs Navigation */}
+            <div className="flex gap-4 mb-6 border-b border-gray-200 dark:border-gray-800">
+                <button
+                    type="button"
+                    onClick={() => setActiveTab('personal')}
+                    className={`pb-3 px-1 text-sm font-medium border-b-2 transition-colors ${
+                        activeTab === 'personal'
+                            ? 'border-primary-600 text-primary-600 dark:border-primary-500 dark:text-primary-500'
+                            : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+                    }`}
+                >
+                    Información Personal
+                </button>
+                <button
+                    type="button"
+                    onClick={() => setActiveTab('security')}
+                    className={`pb-3 px-1 text-sm font-medium border-b-2 transition-colors ${
+                        activeTab === 'security'
+                            ? 'border-primary-600 text-primary-600 dark:border-primary-500 dark:text-primary-500'
+                            : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+                    }`}
+                >
+                    Seguridad
+                </button>
+            </div>
+
             <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden">
-                <div className="p-6 border-b border-gray-200 dark:border-gray-800">
-                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Información Personal</h2>
-                </div>
+                {activeTab === 'personal' ? (
+                    <>
+                        <div className="p-6 border-b border-gray-200 dark:border-gray-800">
+                            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Información Personal</h2>
+                        </div>
 
                 <form onSubmit={handleSubmit(onSubmitClick)} className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Nombre */}
@@ -193,6 +244,18 @@ export const Profile: React.FC = () => {
                         </button>
                     </div>
                 </form>
+                    </>
+                ) : (
+                    <>
+                        <div className="p-6 border-b border-gray-200 dark:border-gray-800">
+                            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Cambiar Contraseña</h2>
+                        </div>
+                        <ChangePasswordForm 
+                            isLoading={savingPassword} 
+                            onSubmitData={handleChangePassword} 
+                        />
+                    </>
+                )}
             </div>
 
             <ConfirmDialog
