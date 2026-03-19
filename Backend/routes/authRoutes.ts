@@ -12,5 +12,7 @@ router.post('/refresh', authController.refreshToken);
 router.get('/me', checkJwt, authController.me);
 router.put('/me', checkJwt, authController.updateProfile);
 router.put('/me/password', checkJwt, authController.changePassword);
+router.post('/forgot-password', authController.forgotPassword);
+router.post('/reset-password', authController.resetPassword);
 
 export default router;

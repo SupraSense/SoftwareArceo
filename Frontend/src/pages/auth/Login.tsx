@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { Lock, Mail, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
@@ -83,9 +83,9 @@ export const Login: React.FC = () => {
                                 error={errors.password?.message}
                             />
                             <div className="flex justify-end">
-                                <a href="#" className="text-sm font-medium text-primary-600 hover:text-primary-500">
+                                <Link to="/forgot-password" className="text-sm font-medium text-primary-600 hover:text-primary-500">
                                     ¿Olvidó su contraseña?
-                                </a>
+                                </Link>
                             </div>
                         </div>
 

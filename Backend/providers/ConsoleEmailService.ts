@@ -1,4 +1,4 @@
-import type { IEmailService, SendInvitationEmailDTO } from '../interfaces/IEmailService';
+import type { IEmailService, SendInvitationEmailDTO, SendPasswordResetEmailDTO } from '../interfaces/IEmailService';
 
 /**
  * ConsoleEmailService — Stub implementation of IEmailService.
@@ -18,6 +18,14 @@ export class ConsoleEmailService implements IEmailService {
         console.log(`  Name:     ${data.firstName} ${data.lastName}`);
         console.log(`  Password: ${data.temporaryPassword}`);
         console.log(`  Link:     ${data.invitationLink}`);
+        console.log('═══════════════════════════════════════════════════════');
+    }
+    async sendPasswordResetEmail(data: SendPasswordResetEmailDTO): Promise<void> {
+        console.log('═══════════════════════════════════════════════════════');
+        console.log('  📧 PASSWORD RESET EMAIL (STUB - NOT ACTUALLY SENT)');
+        console.log('═══════════════════════════════════════════════════════');
+        console.log(`  To:       ${data.to}`);
+        console.log(`  Link:     ${data.resetLink}`);
         console.log('═══════════════════════════════════════════════════════');
     }
 }

@@ -2,6 +2,8 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { Landing } from './pages/publicPage/Landing';
 import { Login } from './pages/auth/Login';
+import { ForgotPasswordPage } from './pages/auth/ForgotPasswordPage';
+import { ResetPasswordPage } from './pages/auth/ResetPasswordPage';
 import { ProtectedRoute } from './auth/ProtectedRoute';
 import { Home } from './pages/features/Home';
 import { TipoTareaPage } from './pages/configuration/TipoTareaPage';
@@ -32,6 +34,8 @@ function App() {
         {/* Rutas Públicas */}
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
 
         {/* Rutas Protegidas */}
         <Route element={<ProtectedRoute />}>

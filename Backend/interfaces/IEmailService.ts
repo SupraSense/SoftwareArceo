@@ -12,7 +12,15 @@ export interface SendInvitationEmailDTO {
     invitationLink: string;
 }
 
+export interface SendPasswordResetEmailDTO {
+    to: string;
+    resetLink: string;
+}
+
 export interface IEmailService {
     /** Sends an invitation email with temporary credentials */
     sendInvitationEmail(data: SendInvitationEmailDTO): Promise<void>;
+    
+    /** Sends a password reset email */
+    sendPasswordResetEmail(data: SendPasswordResetEmailDTO): Promise<void>;
 }

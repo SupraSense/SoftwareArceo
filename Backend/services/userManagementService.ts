@@ -252,6 +252,56 @@ export class UserManagementService {
             invitationLink,
         });
     }
-}
 
+    async processForgotPassword(email: string) {
+        const token = require('crypto').randomBytes(32).toString('hex');
+        const expiresAt = new Date(Date.now() + 3600000); // 1 hour
+
+        try {
+            await prisma.user.update({
+                where: { email },
+                data: {
+                    resetPasswordToken: token,
+                    resetPasswordExpires: expiresAt,
+                },
+            });
+
+            const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+            const resetLink = `${frontendUrl}/reset-password?token=${token}`;
+
+            await this.emailService.sendPasswordResetEmail({
+                to: email,
+                resetLink,
+            });
+        } catch (error: any) {
+            if (error.code === 'P2025') {
+                // Email not found logic is ignored for security
+                return;
+            }
+            throw error;
+        }
+    }
+
+    async processResetPassword(data: import('../validators/authValidation').ResetPasswordInput) {
+        const user = await prisma.user.findUnique({
+            where: { resetPasswordToken: data.token },
+        });
+
+        if (!user || !user.resetPasswordExpires || user.resetPasswordExpires < new Date()) {
+            throw new ValidationError('El token ha caducado o es inválido');
+        }
+
+        // Update password in IDP
+        await this.identityProvider.resetUserPassword(user.id, data.newPassword);
+
+        // Clear tokens
+        await prisma.user.update({
+            where: { id: user.id },
+            data: {
+                resetPasswordToken: null,
+                resetPasswordExpires: null,
+            },
+        });
+    }
+}
 

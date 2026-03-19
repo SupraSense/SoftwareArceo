@@ -232,6 +232,67 @@ export const changePassword = async (req: Request, res: Response) => {
     }
 };
 
+export const forgotPassword = async (req: Request, res: Response) => {
+    const { forgotPasswordSchema } = await import('../validators/authValidation');
+    const parseResult = forgotPasswordSchema.safeParse(req.body);
+    
+    if (!parseResult.success) {
+        return res.status(400).json({ message: parseResult.error.issues[0]?.message || 'Datos inválidos' });
+    }
+
+    // Return generic success message immediately
+    res.json({ 
+        success: true, 
+        message: 'Si el correo ingresado está registrado, recibirás un correo para restablecer tu contraseña en los próximos minutos' 
+    });
+
+    // Process in background
+    (async () => {
+        try {
+            const { UserManagementService } = await import('../services/userManagementService');
+            const { ResendEmailProvider } = await import('../providers/ResendEmailProvider');
+            
+            const identityProvider = new KeycloakIdentityProvider();
+            const emailProvider = new ResendEmailProvider();
+            const userManagementService = new UserManagementService(identityProvider, emailProvider);
+
+            await userManagementService.processForgotPassword(parseResult.data.email);
+        } catch (error: any) {
+            console.error('[AuthController] Error en background forgot password:', error);
+        }
+    })();
+    return;
+};
+
+export const resetPassword = async (req: Request, res: Response) => {
+    const { resetPasswordSchema } = await import('../validators/authValidation');
+    const parseResult = resetPasswordSchema.safeParse(req.body);
+    
+    if (!parseResult.success) {
+        return res.status(400).json({ message: parseResult.error.issues[0]?.message || 'Datos inválidos' });
+    }
+
+    try {
+        const { UserManagementService } = await import('../services/userManagementService');
+        const { ResendEmailProvider } = await import('../providers/ResendEmailProvider');
+        
+        const identityProvider = new KeycloakIdentityProvider();
+        const emailProvider = new ResendEmailProvider();
+        const userManagementService = new UserManagementService(identityProvider, emailProvider);
+
+        await userManagementService.processResetPassword(parseResult.data);
+
+        return res.json({ success: true, message: 'Contraseña restablecida correctamente' });
+    } catch (error: any) {
+        const { ValidationError } = await import('../lib/errors');
+        if (error instanceof ValidationError) {
+            return res.status(400).json({ message: error.message });
+        }
+        console.error('[AuthController] Error resetting password:', error);
+        return res.status(500).json({ message: 'Error interno del servidor al restablecer contraseña' });
+    }
+};
+
 /**
  * PASO 1: Controlador de Silent Refresh.
  *
