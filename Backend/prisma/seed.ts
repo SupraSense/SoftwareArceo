@@ -166,6 +166,18 @@ async function main() {
         }
     ];
 
+    console.log("Inicializando pozo: VacaMuerta")
+    const vacaMuerta = await prisma.pozo.upsert({
+        where: { nombre: 'VacaMuerta' },
+        update: {},
+        create: {
+            nombre: 'Vaca Muerta',
+            ubicacionUrl: 'https://maps.app.goo.gl/Dfme671knciyctZm7',
+            isActive: true
+        }
+    });
+    console.log({ "Pozo creado": vacaMuerta });
+
     for (const p of personalData) {
         await prisma.personal.upsert({
             where: { email: p.email },

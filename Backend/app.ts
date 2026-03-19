@@ -9,6 +9,7 @@ import authRoutes from './routes/authRoutes';
 import clientRoutes from './routes/clientRoutes';
 import personalRoutes from './routes/personalRoutes';
 import userRoutes from './routes/userRoutes';
+import pozoRoutes from './routes/pozoRoutes';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -28,6 +29,7 @@ app.use('/api/tipo-tarea', tipoTareaRoutes);
 app.use('/api/clients', clientRoutes);
 app.use('/api/personal', personalRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/pozos', pozoRoutes);
 
 app.get('/', (_req: Request, res: Response) => {
     res.send('Hello world');

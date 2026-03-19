@@ -15,6 +15,8 @@ import { StaffDetail } from './pages/features/personal/PersonalDetailPage';
 import { UsersPage } from './pages/configuration/users/UsersPage';
 import { UserCreatePage } from './pages/configuration/users/UserCreatePage';
 import { UserDetailPage } from './pages/configuration/users/UserDetailPage';
+import { PozosPage } from './pages/configuration/pozos/PozosPage';
+import { PozoCreatePage } from './pages/configuration/pozos/PozoCreatePage';
 
 
 
@@ -32,7 +34,8 @@ function App() {
           <Route element={<DashboardLayout />}>
             <Route path="/app" element={<Home />} />
             <Route path="/app/configuration/type-task" element={<TipoTareaPage />} />
-            <Route path="/app/configuration/pozos" element={<InProgress />} />
+            <Route path="/app/configuration/pozos" element={<PozosPage />} />
+            <Route path="/app/configuration/pozos/new" element={<PozoCreatePage />} />
             <Route path="/app/configuration/segmentos" element={<InProgress />} />
             <Route path="/app/configuration/usuarios" element={<UsersPage />} />
             <Route path="/app/configuration/usuarios/new" element={<UserCreatePage />} />
