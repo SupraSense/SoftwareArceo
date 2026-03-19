@@ -17,16 +17,19 @@ export const getAllClients = async () => {
         orderBy: { razonSocial: 'asc' },
     });
 
-    return clients.map((c) => ({
-        id: c.id,
-        razonSocial: c.razonSocial,
-        cuit: c.cuit,
-        contactName: c.contacts[0]?.name || 'Sin Contacto',
-        phone: c.contacts[0]?.phone || '',
-        email: c.contacts[0]?.email || '',
-        activeContracts: c._count.contracts,
-        status: c.status.name,
-    }));
+    return clients.map((c) => {
+        const principal = c.contacts.find((ct) => ct.isPrincipal) || c.contacts[0];
+        return {
+            id: c.id,
+            razonSocial: c.razonSocial,
+            cuit: c.cuit,
+            contactName: principal?.name || 'Sin Contacto',
+            phone: principal?.phone || '',
+            email: principal?.email || '',
+            activeContracts: c._count.contracts,
+            status: c.status.name,
+        };
+    });
 };
 
 export const getClientById = async (id: string) => {
@@ -34,7 +37,8 @@ export const getClientById = async (id: string) => {
         where: { id },
         include: {
             status: true,
-            contacts: true,
+            contacts: { orderBy: { isPrincipal: 'desc' } },
+            pozos: { where: { isActive: true }, orderBy: { nombre: 'asc' } },
             _count: {
                 select: { contracts: { where: { isActive: true } } },
             },
@@ -51,9 +55,18 @@ export const getClientById = async (id: string) => {
         cuit: client.cuit,
         address: client.direccion,
         status: client.status.name,
-        contactName: client.contacts[0]?.name || 'Sin Contacto',
-        phone: client.contacts[0]?.phone || '',
-        email: client.contacts[0]?.email || '',
+        contacts: client.contacts.map((ct) => ({
+            id: ct.id,
+            name: ct.name,
+            phone: ct.phone || '',
+            email: ct.email || '',
+            isPrincipal: ct.isPrincipal,
+        })),
+        pozos: client.pozos.map((p) => ({
+            id: p.id,
+            nombre: p.nombre,
+            ubicacionUrl: p.ubicacionUrl,
+        })),
         activeContracts: client._count.contracts,
     };
 };
@@ -73,11 +86,12 @@ export const createClient = async (data: CreateClientInput) => {
                     direccion: data.address || '',
                     statusId: activeStatus.id,
                     contacts: {
-                        create: {
-                            name: data.contactName || '',
-                            phone: data.phone,
-                            email: data.email,
-                        },
+                        create: data.contacts.map((c) => ({
+                            name: c.name || '',
+                            phone: c.phone || null,
+                            email: c.email || null,
+                            isPrincipal: c.isPrincipal,
+                        })),
                     },
                 },
                 include: {
@@ -108,29 +122,37 @@ export const updateClient = async (id: string, data: UpdateClientInput) => {
         throw new ConflictError('No se puede modificar el CUIT de un cliente con contratos existentes');
     }
 
-    return prisma.client.update({
-        where: { id },
-        data: {
-            ...(data.razonSocial !== undefined && { razonSocial: data.razonSocial }),
-            ...(data.address !== undefined && { direccion: data.address }),
-            contacts: {
-                updateMany: {
-                    where: { clientId: id },
-                    data: {
-                        ...(data.contactName !== undefined && { name: data.contactName }),
-                        ...(data.phone !== undefined && { phone: data.phone }),
-                        ...(data.email !== undefined && { email: data.email }),
-                    },
+    return prisma.$transaction(async (tx) => {
+        // Si se envían contactos, reemplazar todos (delete + create)
+        if (data.contacts) {
+            await tx.clientContact.deleteMany({ where: { clientId: id } });
+            await tx.clientContact.createMany({
+                data: data.contacts.map((c) => ({
+                    clientId: id,
+                    name: c.name || '',
+                    phone: c.phone || null,
+                    email: c.email || null,
+                    isPrincipal: c.isPrincipal ?? false,
+                })),
+            });
+        }
+
+        return tx.client.update({
+            where: { id },
+            data: {
+                ...(data.razonSocial !== undefined && { razonSocial: data.razonSocial }),
+                ...(data.cuit !== undefined && { cuit: data.cuit }),
+                ...(data.address !== undefined && { direccion: data.address }),
+            },
+            include: {
+                contacts: { orderBy: { isPrincipal: 'desc' } },
+                status: true,
+                pozos: { where: { isActive: true } },
+                _count: {
+                    select: { contracts: { where: { isActive: true } } },
                 },
             },
-        },
-        include: {
-            contacts: true,
-            status: true,
-            _count: {
-                select: { contracts: { where: { isActive: true } } },
-            },
-        },
+        });
     });
 };
 

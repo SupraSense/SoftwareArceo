@@ -22,6 +22,7 @@ model Client {
   status      ClientStatus    @relation(fields: [statusId], references: [id])
   contacts    ClientContact[]
   contracts   Contract[]
+  pozos       Pozo[]
 }
 
 model Personal {
@@ -61,9 +62,10 @@ model ClientContact {
   id       String  @id @default(uuid())
   clientId String
   client   Client  @relation(fields: [clientId], references: [id])
-  name     String
-  phone    String?
-  email    String?
+  name        String
+  phone       String?
+  email       String?
+  isPrincipal Boolean  @default(false)
 }
 
 model Contract {
@@ -91,6 +93,8 @@ model Pozo {
   id           String   @id @default(uuid())
   nombre       String   @unique
   ubicacionUrl String   @db.Text
+  clienteId    String?
+  cliente      Client?  @relation(fields: [clienteId], references: [id])
   isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())
 }

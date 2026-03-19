@@ -30,7 +30,8 @@ async function main() {
                 create: {
                     name: 'Juan Pérez',
                     phone: '+54 11 5466 8997',
-                    email: 'juan.perez@ypf.com'
+                    email: 'juan.perez@ypf.com',
+                    isPrincipal: true
                 }
             },
             contracts: {
@@ -54,7 +55,8 @@ async function main() {
                 create: {
                     name: 'Maria González',
                     phone: '+54 11 5000 3815',
-                    email: 'maria.gonzalez@shell.com'
+                    email: 'maria.gonzalez@shell.com',
+                    isPrincipal: true
                 }
             },
             contracts: {
@@ -77,7 +79,8 @@ async function main() {
                 create: {
                     name: 'Carlos Rodríguez',
                     phone: '+54 11 6260 5802',
-                    email: 'carlos.rodriguez@total.com'
+                    email: 'carlos.rodriguez@total.com',
+                    isPrincipal: true
                 }
             },
             contracts: {

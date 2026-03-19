@@ -13,6 +13,16 @@ export const getAll = async (_req: Request, res: Response) => {
     }
 };
 
+export const getAvailable = async (_req: Request, res: Response) => {
+    try {
+        const pozos = await pozoService.getAvailablePozos();
+        res.json(pozos);
+    } catch (error) {
+        console.error('[PozoController] Error al obtener pozos disponibles:', error);
+        res.status(500).json({ message: 'Error al obtener los pozos disponibles' });
+    }
+};
+
 export const create = async (req: Request, res: Response) => {
     const parseResult = createPozoSchema.safeParse(req.body);
     if (!parseResult.success) {
@@ -29,6 +39,40 @@ export const create = async (req: Request, res: Response) => {
         }
         console.error('[PozoController] Error al crear:', error);
         return res.status(500).json({ message: 'Error al crear el pozo' });
+    }
+};
+
+export const associate = async (req: Request, res: Response) => {
+    const { clienteId } = req.body;
+    if (!clienteId) {
+        return res.status(400).json({ message: 'El clienteId es obligatorio' });
+    }
+
+    try {
+        const pozo = await pozoService.associateToClient(req.params.id, clienteId);
+        return res.json(pozo);
+    } catch (error) {
+        if (error instanceof NotFoundError) {
+            return res.status(404).json({ message: error.message });
+        }
+        if (error instanceof ConflictError) {
+            return res.status(409).json({ message: error.message });
+        }
+        console.error('[PozoController] Error al asociar pozo:', error);
+        return res.status(500).json({ message: 'Error al asociar el pozo al cliente' });
+    }
+};
+
+export const disassociate = async (req: Request, res: Response) => {
+    try {
+        const pozo = await pozoService.disassociateFromClient(req.params.id);
+        return res.json(pozo);
+    } catch (error) {
+        if (error instanceof NotFoundError) {
+            return res.status(404).json({ message: error.message });
+        }
+        console.error('[PozoController] Error al desasociar pozo:', error);
+        return res.status(500).json({ message: 'Error al desasociar el pozo' });
     }
 };
 

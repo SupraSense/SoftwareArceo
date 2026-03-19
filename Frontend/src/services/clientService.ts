@@ -1,5 +1,5 @@
 import api from './api';
-import type { Client } from '../types/client';
+import type { Client, ClientDetail } from '../types/client';
 
 const RESOURCE = '/clients';
 
@@ -9,18 +9,18 @@ export const clientService = {
         return response.data;
     },
 
-    getById: async (id: string): Promise<Client> => {
-        const response = await api.get<Client>(`${RESOURCE}/${id}`);
+    getById: async (id: string): Promise<ClientDetail> => {
+        const response = await api.get<ClientDetail>(`${RESOURCE}/${id}`);
         return response.data;
     },
 
-    create: async (data: Partial<Client>): Promise<Client> => {
-        const response = await api.post<Client>(RESOURCE, data);
+    create: async (data: Record<string, unknown>): Promise<ClientDetail> => {
+        const response = await api.post<ClientDetail>(RESOURCE, data);
         return response.data;
     },
 
-    update: async (id: string, data: Partial<Client>): Promise<Client> => {
-        const response = await api.put<Client>(`${RESOURCE}/${id}`, data);
+    update: async (id: string, data: Record<string, unknown>): Promise<ClientDetail> => {
+        const response = await api.put<ClientDetail>(`${RESOURCE}/${id}`, data);
         return response.data;
     },
 

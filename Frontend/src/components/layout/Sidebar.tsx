@@ -8,7 +8,6 @@ import {
     Users,
     Truck,
     UserCircle,
-    FileSpreadsheet,
     DollarSign,
     Settings,
     Building2,
@@ -36,7 +35,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ className = '', onClose, isCol
         { name: 'Recursos', icon: Truck, path: '/app/resources' },
         { name: 'Personal', icon: Users, path: '/app/staff' },
         { name: 'Planilla Choferes', icon: UserCircle, path: '/app/drivers' },
-        { name: 'Planilla Talleres', icon: FileSpreadsheet, path: '/app/workshops' },
         { name: 'Facturación', icon: DollarSign, path: '/app/billing' },
     ];
 

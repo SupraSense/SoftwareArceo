@@ -6,6 +6,7 @@ import { useNotification } from './useNotification';
 
 export const usePozos = () => {
     const [pozos, setPozos] = useState<Pozo[]>([]);
+    const [availablePozos, setAvailablePozos] = useState<Pozo[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const { showSuccess, showValidationError, showServerError } = useNotification();
@@ -22,7 +23,16 @@ export const usePozos = () => {
         } finally {
             setLoading(false);
         }
-    }, [showServerError]);
+    }, []);
+
+    const loadAvailablePozos = useCallback(async () => {
+        try {
+            const data = await pozoService.getAvailable();
+            setAvailablePozos(data);
+        } catch (err) {
+            showServerError(err, 'Error al cargar pozos disponibles');
+        }
+    }, []);
 
     const createPozo = async (data: PozoFormData): Promise<boolean> => {
         setLoading(true);
@@ -38,9 +48,7 @@ export const usePozos = () => {
             const errMsg = errorObj.response?.data?.message || 'Error al registrar el pozo';
             setError(errMsg);
 
-            if (status === 400 || status === 403 || status === 404) {
-                showValidationError(errMsg);
-            } else if (status === 409) {
+            if (status === 400 || status === 403 || status === 404 || status === 409) {
                 showValidationError(errMsg);
             } else {
                 showServerError(err, errMsg);
@@ -48,6 +56,44 @@ export const usePozos = () => {
             return false;
         } finally {
             setLoading(false);
+        }
+    };
+
+    const associatePozo = async (pozoId: string, clienteId: string): Promise<boolean> => {
+        try {
+            await pozoService.associate(pozoId, clienteId);
+            showSuccess('Pozo asociado correctamente');
+            return true;
+        } catch (err) {
+            const errorObj = err as { response?: { status?: number; data?: { message?: string } } };
+            const status = errorObj.response?.status;
+            const errMsg = errorObj.response?.data?.message || 'Error al asociar el pozo';
+
+            if (status === 409) {
+                showValidationError(errMsg);
+            } else {
+                showServerError(err, errMsg);
+            }
+            return false;
+        }
+    };
+
+    const disassociatePozo = async (pozoId: string): Promise<boolean> => {
+        try {
+            await pozoService.disassociate(pozoId);
+            showSuccess('Pozo desasociado correctamente');
+            return true;
+        } catch (err) {
+            const errorObj = err as { response?: { status?: number; data?: { message?: string } } };
+            const status = errorObj.response?.status;
+            const errMsg = errorObj.response?.data?.message || 'Error al desasociar el pozo';
+
+            if (status === 404) {
+                showValidationError(errMsg);
+            } else {
+                showServerError(err, errMsg);
+            }
+            return false;
         }
     };
 
@@ -78,10 +124,14 @@ export const usePozos = () => {
 
     return {
         pozos,
+        availablePozos,
         loading,
         error,
         loadPozos,
+        loadAvailablePozos,
         createPozo,
+        associatePozo,
+        disassociatePozo,
         deletePozo,
     };
 };

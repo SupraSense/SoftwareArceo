@@ -54,7 +54,6 @@ function App() {
             <Route path="/app/staff/:id" element={<StaffDetail />} />
             <Route path="/app/drivers" element={<InProgress />} />
             <Route path="/app/drivers" element={<InProgress />} />
-            <Route path="/app/workshops" element={<InProgress />} />
             <Route path="/app/billing" element={<InProgress />} />
           </Route>
         </Route>

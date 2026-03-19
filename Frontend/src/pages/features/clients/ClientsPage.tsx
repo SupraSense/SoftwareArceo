@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { clientService } from '../../../services/clientService';
 import type { Client } from '../../../types/client';
-import { Badge } from '../../../components/ui/Badge';
 import { Button } from '../../../components/ui/Button';
 import { Loader } from '../../../components/ui/Loader';
 import { Phone, Mail, FileText, Search } from 'lucide-react';
@@ -81,8 +80,6 @@ export const Clients = () => {
                                 <th className="p-4 font-medium">CUIT</th>
                                 <th className="p-4 font-medium">Contacto</th>
                                 <th className="p-4 font-medium">Comunicación</th>
-                                <th className="p-4 font-medium">Contratos</th>
-                                <th className="p-4 font-medium">Estado</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
@@ -98,14 +95,6 @@ export const Clients = () => {
                                         {client.phone && <Phone size={16} />}
                                         {client.email && <Mail size={16} />}
                                         {!client.phone && !client.email && '-'}
-                                    </td>
-                                    <td className="p-4">
-                                        <span className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-2 py-1 rounded-full text-xs font-medium">
-                                            {client.activeContracts} contratos
-                                        </span>
-                                    </td>
-                                    <td className="p-4">
-                                        <Badge variant={client.status === 'Activo' ? 'success' : 'default'}>{client.status}</Badge>
                                     </td>
                                 </tr>
                             ))}

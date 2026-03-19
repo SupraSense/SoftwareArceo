@@ -9,8 +9,23 @@ export const pozoService = {
         return response.data;
     },
 
+    getAvailable: async (): Promise<Pozo[]> => {
+        const response = await api.get<Pozo[]>(`${RESOURCE}/available`);
+        return response.data;
+    },
+
     create: async (data: CreatePozoDTO): Promise<Pozo> => {
         const response = await api.post<Pozo>(RESOURCE, data);
+        return response.data;
+    },
+
+    associate: async (pozoId: string, clienteId: string): Promise<Pozo> => {
+        const response = await api.patch<Pozo>(`${RESOURCE}/${pozoId}/associate`, { clienteId });
+        return response.data;
+    },
+
+    disassociate: async (pozoId: string): Promise<Pozo> => {
+        const response = await api.patch<Pozo>(`${RESOURCE}/${pozoId}/disassociate`);
         return response.data;
     },
 

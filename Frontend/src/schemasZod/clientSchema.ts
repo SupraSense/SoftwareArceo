@@ -1,12 +1,23 @@
 import { z } from 'zod';
 
+const contactSchema = z.object({
+    name: z.string().default(''),
+    phone: z.string()
+        .regex(/^\+?\d{4,20}$/, 'Teléfono inválido (opcionalmente +, seguido de 4 a 20 dígitos)')
+        .or(z.literal(''))
+        .default(''),
+    email: z.string()
+        .email('Email inválido')
+        .or(z.literal(''))
+        .default(''),
+    isPrincipal: z.boolean().default(false),
+});
+
 export const clientSchema = z.object({
-    razonSocial: z.string().min(1, 'La Razón Social es obligatoria'),
-    cuit: z.string().regex(/^\d{2}-\d{8}-\d{1}$/, 'Formato inválido (ej. 30-54668997-9)'),
-    address: z.string().optional(),
-    contactName: z.string().optional(),
-    email: z.string().email('Email inválido').or(z.literal('')),
-    phone: z.string().regex(/^[0-9]{9,15}$/, 'Teléfono inválido (9-15 dígitos)').or(z.literal(''))
+    razonSocial: z.string().min(1, 'La Razón Social es obligatoria').max(100, 'Máximo 100 caracteres'),
+    cuit: z.string().regex(/^[\d-]{4,20}$/, 'CUIT inválido (solo números y guiones, de 4 a 20 caracteres)'),
+    address: z.string().default(''),
+    contacts: z.array(contactSchema).min(1, 'Debe tener al menos un contacto'),
 });
 
 export type ClientFormData = z.infer<typeof clientSchema>;

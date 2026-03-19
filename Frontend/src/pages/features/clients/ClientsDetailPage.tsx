@@ -2,34 +2,36 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useClients } from '../../../hooks/useClients';
 import { ClientForm } from '../../../components/clients/ClientForm';
+import { ClientPozosSection } from '../../../components/clients/ClientPozosSection';
 import { Badge } from '../../../components/ui/Badge';
 import { Button } from '../../../components/ui/Button';
 import { Loader } from '../../../components/ui/Loader';
 import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
-import type { Client } from '../../../types/client';
+import type { ClientDetail } from '../../../types/client';
 import type { ClientFormData } from '../../../schemasZod/clientSchema';
-import { ArrowLeft, Edit2, Trash2, Building2 } from 'lucide-react';
+import { ArrowLeft, Edit2, Trash2, Building2, Phone, Mail, User } from 'lucide-react';
 
 export const ClientDetailPage = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const { getClient, saveClient, deleteClient, loading } = useClients();
 
-    const [client, setClient] = useState<Client | null>(null);
+    const [client, setClient] = useState<ClientDetail | null>(null);
     const [isEditing, setIsEditing] = useState(id === 'new');
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
 
+    const fetchClient = async () => {
+        if (id && id !== 'new') {
+            const data = await getClient(id);
+            if (data) setClient(data);
+            else navigate('/app/clients');
+        } else if (id === 'new') {
+            setIsEditing(true);
+        }
+    };
+
     useEffect(() => {
-        const fetchClient = async () => {
-            if (id && id !== 'new') {
-                const data = await getClient(id);
-                if (data) setClient(data);
-                else navigate('/app/clients');
-            } else if (id === 'new') {
-                setIsEditing(true);
-            }
-        };
         fetchClient();
     }, [id]);
 
@@ -65,11 +67,16 @@ export const ClientDetailPage = () => {
         }
     };
 
+    const handlePozosChanged = () => {
+        fetchClient();
+    };
+
     if (loading && !client && id !== 'new') {
         return <Loader message="Cargando detalles..." />;
     }
 
     if (!client && id !== 'new') return null;
+
 
     return (
         <div className="max-w-4xl mx-auto space-y-6 p-6 animate-fadeIn">
@@ -127,29 +134,61 @@ export const ClientDetailPage = () => {
                         {/* Bloques de Datos */}
                         <div className="space-y-4">
                             <div>
-                                <h3 className="text-xs uppercase tracking-wider text-gray-400 font-semibold mb-1">Contacto Principal</h3>
-                                <p className="text-gray-900 dark:text-gray-100 font-medium">{client.contactName || 'Sin especificar'}</p>
-                            </div>
-                            <div>
-                                <h3 className="text-xs uppercase tracking-wider text-gray-400 font-semibold mb-1">Comunicación</h3>
-                                <p className="text-gray-900 dark:text-gray-100">{client.email || '-'}</p>
-                                <p className="text-gray-600 dark:text-gray-400">{client.phone || '-'}</p>
-                            </div>
-                        </div>
-
-                        <div className="space-y-4">
-                            <div>
                                 <h3 className="text-xs uppercase tracking-wider text-gray-400 font-semibold mb-1">Dirección Legal</h3>
                                 <p className="text-gray-900 dark:text-gray-100">{client.address || 'No registrada'}</p>
                             </div>
-                            <div>
-                                <h3 className="text-xs uppercase tracking-wider text-gray-400 font-semibold mb-1">Contratos Activos</h3>
-                                <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{client.activeContracts}</p>
+                        </div>
+
+                        {/* Contactos */}
+                        <div className="space-y-4 col-span-1 md:col-span-2">
+                            <h3 className="text-xs uppercase tracking-wider text-gray-400 font-semibold mb-2">Contactos</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {client.contacts.map((contact, idx) => (
+                                    <div
+                                        key={contact.id || idx}
+                                        className={`p-4 rounded-lg border ${contact.isPrincipal
+                                                ? 'border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-900/20'
+                                                : 'border-gray-200 dark:border-gray-700'
+                                            }`}
+                                    >
+                                        {contact.isPrincipal && (
+                                            <span className="text-xs font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider">
+                                                Principal
+                                            </span>
+                                        )}
+                                        <div className="flex items-center gap-2 mt-1">
+                                            <User size={14} className="text-gray-400" />
+                                            <span className="text-sm font-medium text-gray-900 dark:text-gray-200">
+                                                {contact.name || 'Sin nombre'}
+                                            </span>
+                                        </div>
+                                        {contact.phone && (
+                                            <div className="flex items-center gap-2 mt-1">
+                                                <Phone size={14} className="text-gray-400" />
+                                                <span className="text-sm text-gray-600 dark:text-gray-400">{contact.phone}</span>
+                                            </div>
+                                        )}
+                                        {contact.email && (
+                                            <div className="flex items-center gap-2 mt-1">
+                                                <Mail size={14} className="text-gray-400" />
+                                                <span className="text-sm text-gray-600 dark:text-gray-400">{contact.email}</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     </div>
                 ) : null}
             </div>
+
+            {!isEditing && client && id !== 'new' && (
+                <ClientPozosSection
+                    clientId={client.id}
+                    pozos={client.pozos}
+                    onPozosChanged={handlePozosChanged}
+                />
+            )}
 
             <ConfirmDialog
                 isOpen={isDeleteDialogOpen}

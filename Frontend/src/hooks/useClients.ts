@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { clientService } from '../services/clientService';
-import type { Client } from '../types/client';
+import type { Client, ClientDetail } from '../types/client';
 import type { ClientFormData } from '../schemasZod/clientSchema';
 import { useNotification } from './useNotification';
 
@@ -10,7 +10,6 @@ export const useClients = () => {
     const [error, setError] = useState<string | null>(null);
     const { showSuccess, showValidationError, showServerError } = useNotification();
 
-    // useCallback memoriza la función para evitar re-renderizados innecesarios en los componentes que la usen
     const loadClients = useCallback(async () => {
         setLoading(true);
         try {
@@ -23,9 +22,9 @@ export const useClients = () => {
         } finally {
             setLoading(false);
         }
-    }, [showServerError]);
+    }, []);
 
-    const getClient = async (id: string): Promise<Client | null> => {
+    const getClient = async (id: string): Promise<ClientDetail | null> => {
         setLoading(true);
         try {
             const data = await clientService.getById(id);
@@ -50,7 +49,7 @@ export const useClients = () => {
                 await clientService.create(data);
                 showSuccess('Cliente registrado correctamente');
             }
-            await loadClients(); // Refrescamos la lista de fondo
+            await loadClients();
             setError(null);
             return true;
         } catch (err) {
@@ -60,6 +59,8 @@ export const useClients = () => {
             setError(errMsg);
 
             if (status === 400 || status === 403 || status === 404) {
+                showValidationError(errMsg);
+            } else if (status === 409) {
                 showValidationError(errMsg);
             } else {
                 showServerError(err, errMsg);
