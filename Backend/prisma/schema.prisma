@@ -98,3 +98,17 @@ model Pozo {
   isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())
 }
+
+model Equipo {
+  id        Int      @id @default(autoincrement())
+  nombre    String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model Segmento {
+  id        Int      @id @default(autoincrement())
+  nombre    String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}

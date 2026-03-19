@@ -10,6 +10,8 @@ import clientRoutes from './routes/clientRoutes';
 import personalRoutes from './routes/personalRoutes';
 import userRoutes from './routes/userRoutes';
 import pozoRoutes from './routes/pozoRoutes';
+import equipoRoutes from './routes/equipoRoutes';
+import segmentoRoutes from './routes/segmentoRoutes';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -30,6 +32,8 @@ app.use('/api/clients', clientRoutes);
 app.use('/api/personal', personalRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/pozos', pozoRoutes);
+app.use('/api/equipos', equipoRoutes);
+app.use('/api/segmentos', segmentoRoutes);
 
 app.get('/', (_req: Request, res: Response) => {
     res.send('Hello world');

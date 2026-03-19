@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -192,6 +193,60 @@ async function main() {
         });
     }
     console.log({ "Personal creado": personalData.length });
+
+    // 7. Crear Usuarios
+    console.log("Creando usuario SuperAdmin")
+    const usersData = [
+        {
+            id: '1',
+            email: 'suprasense111@gmail.com',
+            firstName: 'Admin',
+            lastName: 'Principal',
+            dni: '44896272',
+            address: 'Av Colon',
+            role: 'admin',
+            status: 'Activo'
+        }
+    ];
+    for (const p of usersData) {
+        await prisma.user.upsert({
+            where: { email: p.email },
+            update: {
+                firstName: p.firstName,
+                lastName: p.lastName,
+                dni: p.dni,
+                address: p.address,
+                role: p.role,
+                status: p.status
+            },
+            create: p
+        })
+    }
+    //crear segmentos y equipos
+    const segmentos = [
+        { nombre: 'Segmento 1' },
+        { nombre: 'Segmento 2' },
+        { nombre: 'Segmento 3' }
+    ];
+    for (const s of segmentos) {
+        await prisma.segmento.upsert({
+            where: { nombre: s.nombre },
+            update: {},
+            create: s
+        })
+    }
+    const equipos = [
+        { nombre: 'Equipo 1' },
+        { nombre: 'Equipo 2' },
+        { nombre: 'Equipo 3' }
+    ];
+    for (const e of equipos) {
+        await prisma.equipo.upsert({
+            where: { nombre: e.nombre },
+            update: {},
+            create: e
+        })
+    }
 }
 
 main()

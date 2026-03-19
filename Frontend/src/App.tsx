@@ -17,6 +17,10 @@ import { UserCreatePage } from './pages/configuration/users/UserCreatePage';
 import { UserDetailPage } from './pages/configuration/users/UserDetailPage';
 import { PozosPage } from './pages/configuration/pozos/PozosPage';
 import { PozoCreatePage } from './pages/configuration/pozos/PozoCreatePage';
+import { EquiposPage } from './pages/configuration/equipos/EquiposPage';
+import { EquipoCreatePage } from './pages/configuration/equipos/EquipoCreatePage';
+import { SegmentosPage } from './pages/configuration/segmentos/SegmentosPage';
+import { SegmentoCreatePage } from './pages/configuration/segmentos/SegmentoCreatePage';
 
 
 
@@ -36,10 +40,14 @@ function App() {
             <Route path="/app/configuration/type-task" element={<TipoTareaPage />} />
             <Route path="/app/configuration/pozos" element={<PozosPage />} />
             <Route path="/app/configuration/pozos/new" element={<PozoCreatePage />} />
-            <Route path="/app/configuration/segmentos" element={<InProgress />} />
+            <Route path="/app/configuration/segmentos" element={<SegmentosPage />} />
+            <Route path="/app/configuration/segmentos/new" element={<SegmentoCreatePage />} />
+            <Route path="/app/configuration/equipos" element={<EquiposPage />} />
+            <Route path="/app/configuration/equipos/new" element={<EquipoCreatePage />} />
             <Route path="/app/configuration/usuarios" element={<UsersPage />} />
             <Route path="/app/configuration/usuarios/new" element={<UserCreatePage />} />
             <Route path="/app/configuration/usuarios/:id" element={<UserDetailPage />} />
+
             <Route path="/app/clients" element={<Clients />} />
             <Route path="/app/clients/:id" element={<ClientDetailPage />} />
             <Route path="/app/profile" element={<Profile />} />
@@ -52,7 +60,6 @@ function App() {
             <Route path="/app/resources" element={<InProgress />} />
             <Route path="/app/staff" element={<Staff />} />
             <Route path="/app/staff/:id" element={<StaffDetail />} />
-            <Route path="/app/drivers" element={<InProgress />} />
             <Route path="/app/drivers" element={<InProgress />} />
             <Route path="/app/billing" element={<InProgress />} />
           </Route>

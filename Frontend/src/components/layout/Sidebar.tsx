@@ -15,6 +15,7 @@ import {
     Menu,
     Locate,
     TableColumnsSplit,
+    PersonStanding,
     User
 } from 'lucide-react';
 
@@ -42,6 +43,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ className = '', onClose, isCol
         { name: 'Tipos de Tareas', icon: Settings, path: '/app/configuration/type-task' },
         { name: 'Pozos', icon: Locate, path: '/app/configuration/pozos' },
         { name: 'Segmentos', icon: TableColumnsSplit, path: '/app/configuration/segmentos' },
+        { name: 'Equipos', icon: PersonStanding, path: '/app/configuration/equipos' },
         { name: 'Usuarios', icon: User, path: '/app/configuration/usuarios' }
     ];
 

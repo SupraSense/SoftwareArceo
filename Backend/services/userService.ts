@@ -13,8 +13,15 @@ export const createUser = async (data: {
     lastName?: string;
     role?: string;
 }) => {
-    return prisma.user.create({
-        data,
+    return prisma.user.upsert({
+        where: { email: data.email },
+        update: {
+            id: data.id,
+            firstName: data.firstName,
+            lastName: data.lastName,
+            role: data.role,
+        },
+        create: data,
     });
 };
 

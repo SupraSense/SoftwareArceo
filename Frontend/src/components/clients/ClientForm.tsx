@@ -1,7 +1,7 @@
 import React from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { clientSchema, type ClientFormData } from '../../schemasZod/clientSchema';
+import { clientSchema, type ClientFormData, type ClientFormInput } from '../../schemasZod/clientSchema';
 import type { ClientDetail } from '../../types/client';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
@@ -14,7 +14,7 @@ interface ClientFormProps {
 }
 
 export const ClientForm: React.FC<ClientFormProps> = ({ client, onSubmitData, onCancel }) => {
-    const { register, handleSubmit, control, setValue, watch, formState: { errors, isSubmitting } } = useForm<ClientFormData>({
+    const { register, handleSubmit, control, setValue, watch, formState: { errors, isSubmitting } } = useForm<ClientFormInput, unknown, ClientFormData>({
         resolver: zodResolver(clientSchema),
         defaultValues: {
             razonSocial: client?.razonSocial || '',

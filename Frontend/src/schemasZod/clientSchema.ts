@@ -20,4 +20,5 @@ export const clientSchema = z.object({
     contacts: z.array(contactSchema).min(1, 'Debe tener al menos un contacto'),
 });
 
-export type ClientFormData = z.infer<typeof clientSchema>;
+export type ClientFormData = z.output<typeof clientSchema>;
+export type ClientFormInput = z.input<typeof clientSchema>;
