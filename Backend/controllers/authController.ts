@@ -7,6 +7,35 @@ const KEYCLOAK_URL = process.env.KEYCLOAK_URL || 'http://localhost:8080';
 const REALM = process.env.KEYCLOAK_REALM || 'SoftwareArceo';
 const CLIENT_ID = process.env.KEYCLOAK_CLIENT_ID || 'sgo-frontend';
 const CLIENT_SECRET = process.env.KEYCLOAK_CLIENT_SECRET || 'my-secret-key-123';
+const TOKEN_URL = `${KEYCLOAK_URL}/realms/${REALM}/protocol/openid-connect/token`;
+
+/**
+ * Helper reutilizable para setear las cookies de tokens con flags de seguridad.
+ * Se usa tanto en login como en refreshToken para evitar duplicación (DRY / SRP).
+ */
+const setTokenCookies = (
+    res: Response,
+    accessToken: string,
+    refreshToken: string,
+    expiresIn: number,
+    refreshExpiresIn: number
+): void => {
+    const isProduction = process.env.NODE_ENV === 'production';
+
+    res.cookie('access_token', accessToken, {
+        httpOnly: true,       // Inaccesible desde JS del cliente — previene XSS
+        secure: isProduction, // Solo HTTPS en producción
+        sameSite: 'lax',      // Protección CSRF — permite navegación normal
+        maxAge: expiresIn * 1000
+    });
+
+    res.cookie('refresh_token', refreshToken, {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: 'lax',
+        maxAge: (refreshExpiresIn || 3600) * 1000
+    });
+};
 
 export const login = async (req: Request, res: Response) => {
     try {
@@ -21,9 +50,7 @@ export const login = async (req: Request, res: Response) => {
             scope: 'openid'
         });
 
-        const tokenUrl = `${KEYCLOAK_URL}/realms/${REALM}/protocol/openid-connect/token`;
-
-        const response = await axios.post(tokenUrl, data, {
+        const response = await axios.post(TOKEN_URL, data, {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
@@ -31,20 +58,8 @@ export const login = async (req: Request, res: Response) => {
 
         const { access_token, refresh_token, expires_in, refresh_expires_in } = response.data;
 
-        // Configuración de seguridad de cookies para SupraSense
-        res.cookie('access_token', access_token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            maxAge: expires_in * 1000
-        });
-
-        res.cookie('refresh_token', refresh_token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            maxAge: (refresh_expires_in || 3600) * 1000
-        });
+        // Usa el helper centralizado para setear ambas cookies
+        setTokenCookies(res, access_token, refresh_token, expires_in, refresh_expires_in);
 
         // Decodificación segura del JWT para la sesión
         let user = { email };
@@ -183,5 +198,69 @@ export const updateProfile = async (req: Request, res: Response) => {
     } catch (error) {
         console.error('Error updating profile:', error);
         return res.status(500).json({ message: 'Error updating profile' });
+    }
+};
+
+/**
+ * PASO 1: Controlador de Silent Refresh.
+ *
+ * Flujo:
+ * 1. Extrae el refresh_token de la cookie HttpOnly.
+ * 2. Si no existe → 401 (no hay sesión renovable).
+ * 3. Envía el refresh_token a Keycloak con grant_type='refresh_token'.
+ * 4. Si Keycloak acepta → pisa ambas cookies con los nuevos tokens.
+ * 5. Si Keycloak rechaza (token expirado/revocado) → limpia cookies → 401.
+ *
+ * Decisiones de seguridad:
+ * - NO requiere checkJwt: se llama justamente cuando el access_token ya expiró.
+ * - La posesión del refresh_token (cookie HttpOnly) es la credencial.
+ * - En caso de fallo se limpian AMBAS cookies para forzar re-login limpio.
+ */
+export const refreshToken = async (req: Request, res: Response) => {
+    const currentRefreshToken = req.cookies?.refresh_token;
+
+    // Sin refresh_token no hay nada que renovar
+    if (!currentRefreshToken) {
+        return res.status(401).json({
+            success: false,
+            message: 'No se encontró token de refresco'
+        });
+    }
+
+    try {
+        const data = qs.stringify({
+            client_id: CLIENT_ID,
+            client_secret: CLIENT_SECRET,
+            grant_type: 'refresh_token',
+            refresh_token: currentRefreshToken
+        });
+
+        const response = await axios.post(TOKEN_URL, data, {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        });
+
+        const { access_token, refresh_token, expires_in, refresh_expires_in } = response.data;
+
+        // Pisa las cookies actuales con los nuevos tokens (mismas flags de seguridad)
+        setTokenCookies(res, access_token, refresh_token, expires_in, refresh_expires_in);
+
+        return res.json({ success: true });
+
+    } catch (error: any) {
+        // Keycloak rechazó el refresh_token → sesión definitivamente expirada
+        // Limpiamos ambas cookies para dejar un estado limpio
+        res.clearCookie('access_token');
+        res.clearCookie('refresh_token');
+
+        console.error('[AuthController] Refresh token rechazado por Keycloak:',
+            error.response?.data || error.message
+        );
+
+        return res.status(401).json({
+            success: false,
+            message: 'Sesión expirada. Por favor inicie sesión nuevamente.'
+        });
     }
 };

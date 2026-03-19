@@ -1,6 +1,7 @@
 {
     "realm": "SoftwareArceo",
     "enabled": true,
+    "accessTokenLifespan": 900,
     "roles": {
         "realm": [
             {
@@ -8,16 +9,16 @@
                 "description": "Administrador del SGO"
             },
             {
-                "name": "coordinador",
+                "name": "Supervisor",
                 "description": "Gestión de OTs y Recursos"
             },
             {
-                "name": "chofer",
-                "description": "Personal operativo de campo"
+                "name": "Empleado",
+                "description": "Carga de remitos"
             },
             {
-                "name": "taller_movil",
-                "description": "Mantenimiento de recursos"
+                "name": "Cliente",
+                "description": "Consulta de trabajos realizados"
             }
         ]
     },
