@@ -125,7 +125,7 @@ async function main() {
     console.log({ "Estados Personal creados": personalStatuses });
 
     // 5. Crear Areas de Personal
-    const personalAreas = ['Logística', 'Módulos', 'Periféricos'];
+    const personalAreas = ['Chofer', 'Logística', 'Módulos', 'Periféricos'];
     const areaMap: Record<string, number> = {};
 
     for (const area of personalAreas) {
@@ -145,7 +145,7 @@ async function main() {
             apellido: 'Perez',
             email: 'juan.perez@example.com',
             telefono: '+54911-5555-5555',
-            areaId: areaMap['Logística'],
+            areaId: areaMap['Chofer'],
             statusId: statusMap['Disponible'],
             fecha_ingreso: new Date('2023-01-15')
         },
@@ -155,7 +155,7 @@ async function main() {
             email: 'ana.gomez@example.com',
             telefono: '+54911-6666-6666',
             areaId: areaMap['Módulos'],
-            statusId: statusMap['En Servicio'], // Was 'Ocupado' but valid status is 'En Servicio'
+            statusId: statusMap['En Servicio'],
             fecha_ingreso: new Date('2023-03-10')
         },
         {
@@ -163,8 +163,7 @@ async function main() {
             apellido: 'Rodriguez',
             email: 'carlos.rodriguez@example.com',
             telefono: '+54911-7777-7777',
-            areaId: areaMap['Periféricos'], // Was 'RRHH' but valid is 'Periféricos' (Wait, mock data had RRHH? Prompt says Logistica, Modulos, Perisfericos)
-            // Let's assume Carlos is in Perifericos now as RRHH is not in the requested list.
+            areaId: areaMap['Periféricos'],
             statusId: statusMap['Licencia'],
             fecha_ingreso: new Date('2022-11-20')
         }
@@ -195,7 +194,7 @@ async function main() {
     console.log({ "Personal creado": personalData.length });
 
     // 7. Crear Usuarios
-    console.log("Creando usuario SuperAdmin")
+    console.log("Creado usuario SuperAdmin")
     const usersData = [
         {
             id: '1',
@@ -247,6 +246,9 @@ async function main() {
             create: e
         })
     }
+    console.log("Equipos y segmentos creados")
+    //crear choferes
+
 }
 
 main()

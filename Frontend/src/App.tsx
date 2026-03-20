@@ -23,6 +23,7 @@ import { EquiposPage } from './pages/configuration/equipos/EquiposPage';
 import { EquipoCreatePage } from './pages/configuration/equipos/EquipoCreatePage';
 import { SegmentosPage } from './pages/configuration/segmentos/SegmentosPage';
 import { SegmentoCreatePage } from './pages/configuration/segmentos/SegmentoCreatePage';
+import { PlanillasPage } from './pages/features/planillas/PlanillasPage';
 
 
 
@@ -64,7 +65,7 @@ function App() {
             <Route path="/app/resources" element={<InProgress />} />
             <Route path="/app/staff" element={<Staff />} />
             <Route path="/app/staff/:id" element={<StaffDetail />} />
-            <Route path="/app/drivers" element={<InProgress />} />
+            <Route path="/app/drivers" element={<PlanillasPage />} />
             <Route path="/app/billing" element={<InProgress />} />
           </Route>
         </Route>

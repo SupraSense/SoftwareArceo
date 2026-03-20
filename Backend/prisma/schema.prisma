@@ -38,6 +38,7 @@ model Personal {
   fecha_ingreso DateTime
   created_at    DateTime       @default(now())
   updated_at    DateTime       @updatedAt
+  planillas     PlanillaMensual[]
 }
 
 model PersonalStatus {
@@ -114,3 +115,62 @@ model Segmento {
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
 }
+
+enum EstadoDia {
+  TRABAJO
+  FRANCO
+  VACACIONES
+}
+
+model PlanillaMensual {
+  id       String @id @default(uuid())
+  choferId Int
+  mes      Int
+  anio     Int
+
+  chofer Personal      @relation(fields: [choferId], references: [id])
+  dias   DiaPlanilla[]
+
+  @@unique([choferId, mes, anio]) // Un chofer solo tiene una planilla por mes
+}
+
+model DiaPlanilla {
+  id          String    @id @default(uuid())
+  planillaId  String
+  fecha       DateTime
+  estado      EstadoDia @default(TRABAJO)
+  observacion String?   @db.VarChar(300)
+
+  planilla      PlanillaMensual @relation(fields: [planillaId], references: [id], onDelete: Cascade)
+  pernocta      Pernocta?
+  conexiones    Conexion[]
+  desconexiones Desconexion[]
+
+  @@unique([planillaId, fecha]) // Solo un registro de día por fecha en una planilla
+}
+
+// Eventos
+model Pernocta {
+  id            String @id @default(uuid())
+  diaPlanillaId String @unique // Garantiza max 1 por día
+  ubicacion     String
+  patente       String
+
+  diaPlanilla DiaPlanilla @relation(fields: [diaPlanillaId], references: [id], onDelete: Cascade)
+}
+
+model Conexion {
+  id            String @id @default(uuid())
+  diaPlanillaId String
+  patente       String
+
+  diaPlanilla DiaPlanilla @relation(fields: [diaPlanillaId], references: [id], onDelete: Cascade)
+}
+
+model Desconexion {
+  id            String @id @default(uuid())
+  diaPlanillaId String
+  patente       String
+
+  diaPlanilla DiaPlanilla @relation(fields: [diaPlanillaId], references: [id], onDelete: Cascade)
+}

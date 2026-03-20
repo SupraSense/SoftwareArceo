@@ -12,6 +12,7 @@ import userRoutes from './routes/userRoutes';
 import pozoRoutes from './routes/pozoRoutes';
 import equipoRoutes from './routes/equipoRoutes';
 import segmentoRoutes from './routes/segmentoRoutes';
+import planillaMensualRoutes from './routes/planillaMensualRoutes';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -34,6 +35,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/pozos', pozoRoutes);
 app.use('/api/equipos', equipoRoutes);
 app.use('/api/segmentos', segmentoRoutes);
+app.use('/api/planillas', planillaMensualRoutes);
 
 app.get('/', (_req: Request, res: Response) => {
     res.send('Hello world');
